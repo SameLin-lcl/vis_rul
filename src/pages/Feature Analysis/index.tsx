@@ -9,7 +9,7 @@ import { drawGlyph } from "../components/drawFunction";
 import { culFeatureImportance, scaleFunction } from "../components/utils";
 import { MARGIN } from "../constant";
 
-const LABEL_WIDTH = 70;
+const LABEL_WIDTH = 90;
 const FEATURE_LABEL_HEIGHT = 30;
 const minBandWidth = 2;
 
@@ -98,6 +98,7 @@ export default function FeatureView(props: any): JSX.Element {
     //   .attr("stroke-width", 0.5);
 
     const labelHeight = yScale(1) - yScale(0);
+    const glyphRadius = Math.min(30, labelHeight / 2 - 5);
 
     data.forEach((d, i) => {
       const gBlock = g
@@ -125,9 +126,9 @@ export default function FeatureView(props: any): JSX.Element {
       drawGlyph(
         gBlock,
         d.node,
-        () => rect.left + 40,
+        () => rect.right - glyphRadius - 10,
         () => yScale(i),
-        3
+        glyphRadius
       );
     });
   };
@@ -219,11 +220,7 @@ export default function FeatureView(props: any): JSX.Element {
       const width = xScale(i + 1, "band") / 2;
       const meanValue = xScale(i + 1, "param");
 
-      const result = width * (Math.abs(d.importance) / meanValue);
-
-      console.log(width, meanValue, d.importance, result);
-
-      return result;
+      return width * (Math.abs(d.importance) / meanValue);
     };
 
     data.forEach((item, index) => {

@@ -355,7 +355,7 @@ export default function Performance(props: any): JSX.Element {
     MAX_PERF_DATA.models.forEach((model, index: number) => {
       g.append("text")
         .text(model)
-        .attr("x", rect.right)
+        .attr("x", rect.right - 5)
         .attr("y", (yScale(model) as number) + rowHeight / 2 + FONT_SIZE / 2)
         .attr("text-anchor", "end")
         .attr("font-size", FONT_SIZE);
@@ -363,7 +363,7 @@ export default function Performance(props: any): JSX.Element {
   };
 
   const draw = (data: DataType[]): void => {
-    const LABEL_WIDTH = 30;
+    const LABEL_WIDTH = 40;
     const LABEL_TOP_HEIGHT = 40;
     const PREF_CHART_WIDTH = 180;
 

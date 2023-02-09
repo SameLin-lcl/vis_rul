@@ -9,11 +9,11 @@ export const drawGlyph = (
   d: DataType,
   xScale: d3.ScaleLinear<number, number, never> | ScaleType,
   yScale: d3.ScaleLinear<number, number, never> | ScaleType,
-  size: number = 1
+  radius: number = 8
 ): void => {
-  const ARC_IN_RADIUS = 2 * size;
-  const ARC_OUT_RADIUS_RUL = 4 * size;
-  const ARC_OUT_RADIUS = 8 * size;
+  const ARC_IN_RADIUS = radius / 4;
+  const ARC_OUT_RADIUS_RUL = radius / 2;
+  const ARC_OUT_RADIUS = radius;
   const COLORS = ["#5bd1d7", "#348498", "#3b9a9c", "#a696c8"];
   const ARC_MARGIN = Math.PI * 0.02;
 
