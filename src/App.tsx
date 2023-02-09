@@ -1,15 +1,54 @@
 import React from "react";
-import "./App.css";
-import SettingPanel from "./pages/OverView";
+import Performance from "./pages/Performance";
+import SettingPanel from "./pages/SettingPanel";
+import ScatterView from "./pages/Scatter";
+import UnitTimeline from "./pages/UnitTimeline";
+import FeatureView from "./pages/Feature Analysis";
 
 function App(): JSX.Element {
   return (
-    <div className="App">
-      <div className="app-left" style={{ width: "20vw" }}>
-        <SettingPanel />
+    <div
+      id={"app"}
+      style={{
+        display: "flex",
+        fontSize: 16,
+        height: "100vh",
+        overflow: "hidden",
+        gap: 5
+      }}
+    >
+      <div
+        style={{
+          flex: 2,
+          display: "flex",
+          gap: 5,
+          flexDirection: "column"
+        }}
+      >
+        <SettingPanel containerStyle={{ width: "20vw", height: "50vh" }} />
+        <Performance containerStyle={{ width: "20vw", height: "50vh" }} />
       </div>
-      <div className="app-center" style={{ width: "50vw" }}></div>
-      <div className="app-right" style={{ width: "30vw" }}></div>
+      <div
+        style={{
+          flex: 4,
+          display: "flex",
+          gap: 5,
+          flexDirection: "column"
+        }}
+      >
+        <ScatterView containerStyle={{ width: "40vw", height: "50vh" }} />
+        <FeatureView containerStyle={{ width: "40vw", height: "50vh" }} />
+      </div>
+      <div
+        style={{
+          flex: 4,
+          display: "flex",
+          gap: 5,
+          flexDirection: "column"
+        }}
+      >
+        <UnitTimeline containerStyle={{ width: "40vw", height: "100vh" }} />
+      </div>
     </div>
   );
 }
