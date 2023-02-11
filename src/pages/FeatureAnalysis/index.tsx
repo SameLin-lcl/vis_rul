@@ -55,18 +55,6 @@ export default function FeatureView(props: any): JSX.Element {
     xScale: any,
     yScale: d3.ScaleLinear<number, number, never>
   ): void => {
-    /**
-     * TEST
-     */
-    // g.append("rect")
-    //   .attr("x", rect.left)
-    //   .attr("y", rect.top)
-    //   .attr("width", rect.right - rect.left)
-    //   .attr("height", rect.bottom - rect.top)
-    //   .style("fill", "transparent")
-    //   .attr("stroke", "#000")
-    //   .attr("stroke-width", 0.5);
-
     g.selectAll("text")
       .data([{ name: "unit" }, ...data])
       .enter()
@@ -85,18 +73,6 @@ export default function FeatureView(props: any): JSX.Element {
     xScale: any,
     yScale: d3.ScaleLinear<number, number, never>
   ): void => {
-    /**
-     * TEST
-     */
-    // g.append("rect")
-    //   .attr("x", rect.left)
-    //   .attr("y", rect.top)
-    //   .attr("width", rect.right - rect.left)
-    //   .attr("height", rect.bottom - rect.top)
-    //   .style("fill", "transparent")
-    //   .attr("stroke", "#000")
-    //   .attr("stroke-width", 0.5);
-
     const labelHeight = yScale(1) - yScale(0);
     const glyphRadius = Math.min(30, labelHeight / 2 - 5);
 
@@ -220,7 +196,7 @@ export default function FeatureView(props: any): JSX.Element {
       const width = xScale(i + 1, "band") / 2;
       const meanValue = xScale(i + 1, "param");
 
-      return width * (Math.abs(d.importance) / meanValue);
+      return width * (Math.abs(d.importance) / meanValue) * 0.5;
     };
 
     data.forEach((item, index) => {

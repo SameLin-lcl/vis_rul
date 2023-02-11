@@ -2,7 +2,7 @@ import _ from "lodash";
 
 const MOCK_TIMELINE_LEN = 120;
 const MOCK_MODEL_NUM = 4;
-export const MOCK_FEATURE_NUM = 4;
+export const MOCK_FEATURE_NUM = 11;
 export const MOCK_MODEL_VALUE_MAX = 100;
 export const MOCK_MODELS = ["RF", "SVR", "XGB", "LSTM"];
 
@@ -10,6 +10,15 @@ export const MOCK_TIMELINE_DATA = {
   overall: Array(MOCK_TIMELINE_LEN)
     .fill(0)
     .map((d, i) => _.random(0, 1, true)),
+
+  features: Array(MOCK_FEATURE_NUM)
+    .fill(0)
+    .map(() => {
+      return Array(MOCK_TIMELINE_LEN)
+        .fill(0)
+        .map(() => _.random(0, 1, true));
+    }),
+
   models: Array(MOCK_MODEL_NUM)
     .fill(0)
     .map((d, i) => {
@@ -20,8 +29,16 @@ export const MOCK_TIMELINE_DATA = {
             value: _.random(-MOCK_MODEL_VALUE_MAX, MOCK_MODEL_VALUE_MAX, true),
             importance: Array(MOCK_FEATURE_NUM)
               .fill(0)
-              .map((d, i) => _.random(0, 1, true))
+              .map((d, i) => _.random(0, 1, true)),
+            variance: _.random(0, 1, true)
           };
         });
     })
 };
+
+export const MOCK_MODEL_TIMELINE_DATA = Array(MOCK_MODEL_NUM)
+  .fill(0)
+  .map(() => ({
+    mean: _.random(-MOCK_MODEL_VALUE_MAX, MOCK_MODEL_VALUE_MAX, true),
+    variance: _.random(0, 1, true)
+  }));

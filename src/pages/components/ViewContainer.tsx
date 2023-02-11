@@ -3,7 +3,15 @@ import React, { useEffect, useLayoutEffect } from "react";
 import * as d3 from "d3";
 
 export default function ViewContainer(props: IProps): JSX.Element {
-  const { containerStyle, chartRef, dimensions, setDimensions, setSVG } = props;
+  const {
+    containerStyle,
+    chartRef,
+    dimensions,
+    setDimensions,
+    setSVG,
+    containerClass,
+    title
+  } = props;
 
   useEffect(() => {
     const updateDimensions = (): void => {
@@ -44,6 +52,7 @@ export default function ViewContainer(props: IProps): JSX.Element {
 
   return (
     <div
+      className={containerClass ?? ""}
       style={{
         height: "100%",
         border: "solid 1px #eee",
@@ -55,27 +64,29 @@ export default function ViewContainer(props: IProps): JSX.Element {
         ...containerStyle
       }}
     >
-      <div
-        style={{
-          position: "relative",
-          fontSize: "0.9rem",
-          color: "#272727",
-          boxSizing: "border-box"
-          // backgroundColor: "#eee"
-        }}
-      >
-        <p
+      {title !== undefined && (
+        <div
           style={{
-            position: "absolute",
-            margin: 5,
-            paddingBottom: 2,
-            display: "inline-block",
-            borderBottom: "solid 1px #000"
+            position: "relative",
+            fontSize: "1rem",
+            color: "#272727",
+            boxSizing: "border-box"
+            // backgroundColor: "#eee"
           }}
         >
-          {props.title}
-        </p>
-      </div>
+          <p
+            style={{
+              position: "absolute",
+              margin: 5,
+              paddingBottom: 2,
+              display: "inline-block",
+              borderBottom: "solid 1px #000"
+            }}
+          >
+            {props.title}
+          </p>
+        </div>
+      )}
       <div ref={chartRef} style={{ flex: 1, maxHeight: "100%" }}>
         {props.children}
       </div>

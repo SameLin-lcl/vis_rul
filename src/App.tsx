@@ -3,7 +3,7 @@ import Performance from "./pages/Performance";
 import SettingPanel from "./pages/SettingPanel";
 import ScatterView from "./pages/Scatter";
 import UnitTimeline from "./pages/UnitTimeline";
-import FeatureView from "./pages/Feature Analysis";
+import FeatureView from "./pages/FeatureAnalysis";
 
 function App(): JSX.Element {
   return (

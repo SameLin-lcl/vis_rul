@@ -1,4 +1,4 @@
-import { MAX_FEATURE_DATA } from "../Feature Analysis/mock";
+import { MAX_FEATURE_DATA } from "../FeatureAnalysis/mock";
 
 export const culFeatureImportance = (data) => {
   const importance = Array(MAX_FEATURE_DATA.length)

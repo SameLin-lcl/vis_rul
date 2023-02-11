@@ -2,8 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import ViewContainer from "../components/ViewContainer";
 import * as d3 from "d3";
-import { MAX_SCATTER_DATA, mockScatterData } from "./mock";
-import { DataType } from "./type";
+import { mockScatterData } from "./mock";
 import { drawGlyph } from "../components/drawFunction";
 import { MARGIN } from "../constant";
 
@@ -57,7 +56,7 @@ export default function ScatterView(props: any): JSX.Element {
     //   .attr("transform", `translate(${MARGIN.left}, 0)`)
     //   .call(d3.axisLeft(yScale));
 
-    data.forEach((d) => drawGlyph(svg, d, xScale, yScale));
+    data.forEach((d) => drawGlyph(svg, d, xScale, yScale, 12));
     // svg
     //   .selectAll("circle")
     //   .data(data)

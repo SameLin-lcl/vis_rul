@@ -6,6 +6,7 @@ import * as d3 from "d3";
 import { COLORS, FONT_SIZE, PRIMARY_COLOR } from "../../style";
 import { MARGIN } from "../constant";
 import { RectType } from "../type";
+
 const BAR_WIDTH = 10;
 
 export default function Performance(props: any): JSX.Element {
@@ -33,8 +34,7 @@ export default function Performance(props: any): JSX.Element {
       right: number;
       bottom: number;
     },
-    yPosScale: any,
-    MARGIN: any
+    yPosScale: any
   ): void => {
     svg
       .append("text")
@@ -210,10 +210,11 @@ export default function Performance(props: any): JSX.Element {
 
           svg
             .append("circle")
-            .attr("r", 1)
+            .attr("r", 2)
             .attr("cx", x)
             .attr("cy", y)
-            .style("stroke", () => (f.value >= 0 ? "#6fe38c" : "#ffb6a6"))
+            .style("fill", () => (f.value >= 0 ? "#6fe38c" : "#ffb6a6"))
+            // .style("stroke", () => (f.value >= 0 ? "#6fe38c" : "#ffb6a6"))
             .attr("transform", transform);
 
           svg
@@ -355,7 +356,7 @@ export default function Performance(props: any): JSX.Element {
     MAX_PERF_DATA.models.forEach((model, index: number) => {
       g.append("text")
         .text(model)
-        .attr("x", rect.right - 5)
+        .attr("x", rect.right - 10)
         .attr("y", (yScale(model) as number) + rowHeight / 2 + FONT_SIZE / 2)
         .attr("text-anchor", "end")
         .attr("font-size", FONT_SIZE);
@@ -363,7 +364,7 @@ export default function Performance(props: any): JSX.Element {
   };
 
   const draw = (data: DataType[]): void => {
-    const LABEL_WIDTH = 40;
+    const LABEL_WIDTH = 60;
     const LABEL_TOP_HEIGHT = 40;
     const PREF_CHART_WIDTH = 180;
 

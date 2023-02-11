@@ -3,8 +3,8 @@ import _ from "lodash";
 const MAX_PERF_DATA = {
   models: ["RF", "LSTM", "SVR", "XGB"],
   perf: ["RSME", "score", "r2"].map((item) => ({ label: item, value: 100 })),
-  showNum: 20,
-  features: Array(21)
+  showNum: 14,
+  features: Array(14)
     .fill(0)
     .map((_, i) => `s_${i}`)
 };

@@ -1,7 +1,7 @@
 import { mockNodeData } from "../Scatter/mock";
 import _ from "lodash";
 
-const FEATURE_NUM = 21;
+const FEATURE_NUM = 14;
 
 export const MAX_FEATURE_DATA = Array(FEATURE_NUM)
   .fill(0)
@@ -10,7 +10,9 @@ export const MAX_FEATURE_DATA = Array(FEATURE_NUM)
     const minValue = _.random(-1000, maxValue);
 
     return {
-      name: `s_${i + 1}`,
+      name: `s${i + 1}`,
+      overImportance: _.random(-1, 1, true),
+      variance: _.random(0, 1, true),
       maxValue,
       minValue
     };
