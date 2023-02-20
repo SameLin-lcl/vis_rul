@@ -8,13 +8,14 @@ import { FONT_SIZE, PRIMARY_COLOR } from "../../style";
 import { drawGlyph } from "../components/drawFunction";
 import { culFeatureImportance, scaleFunction } from "../components/utils";
 import { MARGIN } from "../constant";
+import { observer } from "mobx-react";
 
 const LABEL_WIDTH = 90;
 const FEATURE_LABEL_HEIGHT = 30;
 const minBandWidth = 2;
 
-export default function FeatureView(props: any): JSX.Element {
-  const { containerStyle } = props;
+export default observer(function FeatureView(props: any): JSX.Element {
+  const { containerStyle, globalData } = props;
 
   const chartRef: any = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -22,9 +23,11 @@ export default function FeatureView(props: any): JSX.Element {
   const data = FEATURE_DATA;
 
   useLayoutEffect(() => {
+    console.log("LOADING FEATURE");
     if (svg !== null && dimensions.width !== 0) {
       draw(data);
       return () => {
+        console.log("REMOVE FEATURE");
         svg.selectAll("*").remove();
       };
     }
@@ -99,13 +102,13 @@ export default function FeatureView(props: any): JSX.Element {
         .attr("y", yScale(i) + FONT_SIZE / 2)
         .attr("font-size", FONT_SIZE * 0.8);
 
-      drawGlyph(
-        gBlock,
-        d.node,
-        () => rect.right - glyphRadius - 10,
-        () => yScale(i),
-        glyphRadius
-      );
+      drawGlyph({
+        svg: gBlock,
+        d: d.node,
+        xScale: () => rect.right - glyphRadius - 10,
+        yScale: () => yScale(i),
+        radius: glyphRadius
+      });
     });
   };
 
@@ -291,4 +294,4 @@ export default function FeatureView(props: any): JSX.Element {
       setSVG={setSVG}
     ></ViewContainer>
   );
-}
+});

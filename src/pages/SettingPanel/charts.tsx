@@ -1,3 +1,4 @@
+// @ts-nocheck
 import ViewContainer from "../components/ViewContainer";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { IProps } from "../components/types";
@@ -5,7 +6,7 @@ import * as d3 from "d3";
 import { MOCK_UNITS_DATA } from "./mock";
 import { MAX_FEATURE_DATA } from "../FeatureAnalysis/mock";
 
-export const ScatterChart = (props: IProps): JSX.Element => {
+export const ScatterChart = ({ units, unitsMaxMin }: any): JSX.Element => {
   const chartRef: any = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [svg, setSVG] = useState(d3.create("svg"));
@@ -13,14 +14,20 @@ export const ScatterChart = (props: IProps): JSX.Element => {
 
   useLayoutEffect(() => {
     if (svg !== null && dimensions.width !== 0) {
-      draw(data);
+      if (units.length > 0) {
+        draw(units);
+      } else {
+        svg.append("text").text("no data");
+      }
       return () => {
         svg.selectAll("*").remove();
       };
     }
-  }, [svg, data, dimensions]);
+  }, [svg, units, dimensions]);
 
-  const draw = (data: Array<{ name: string; x: number; y: number }>): void => {
+  const draw = (
+    data: Array<{ unitId: string | number; x: number; y: number; rul: number }>
+  ): void => {
     const LABEL_BOTTOM_HEIGHT = 2;
     const LABEL_LEFT_WIDTH = 2;
     const CHART_PADDING = 5;
@@ -34,12 +41,17 @@ export const ScatterChart = (props: IProps): JSX.Element => {
 
     const xScale = d3
       .scaleLinear()
-      .domain([0, 100])
+      .domain([unitsMaxMin.x.min, unitsMaxMin.x.max])
       .range([mainRect.left, mainRect.right]);
     const yScale = d3
       .scaleLinear()
-      .domain([0, 100])
+      .domain([unitsMaxMin.y.min, unitsMaxMin.y.max])
       .range([mainRect.top, mainRect.bottom]);
+
+    const colorScaler = d3
+      .scaleLinear()
+      .domain([unitsMaxMin.rul.min, unitsMaxMin.rul.max])
+      .range(["#ffb142", "#218c74"]);
 
     // svg
     //   .append("g")
@@ -61,15 +73,90 @@ export const ScatterChart = (props: IProps): JSX.Element => {
     //   .selectAll("path")
     //   .attr("stroke", "#aaa");
 
+    /**
+     * 刷选
+     */
+
+    const updateChart = ({ selection }: any, isSelected = false): void => {
+      if (selection !== undefined) {
+        const [[x0, y0], [x1, y1]] = selection;
+
+        const filterFunction = (d: any): void => {
+          return (
+            x0 <= xScale(d.x) &&
+            xScale(d.x) < x1 &&
+            y0 <= yScale(d.y) &&
+            yScale(d.y) < y1
+          );
+        };
+
+        if (isSelected) {
+          d3.selectAll(".unit-pca")
+            .classed("selecting-unit", false)
+            .filter(filterFunction)
+            .classed("selected-unit", true);
+        } else {
+          d3.selectAll(".unit-pca").classed("selecting-unit", filterFunction);
+        }
+      }
+    };
+
+    svg.call(
+      d3
+        .brush()
+        .extent([
+          [0, 0],
+          [dimensions.width, dimensions.height]
+          // [xScale.range()[0], yScale.range()[0]],
+          // [xScale.range()[1], yScale.range()[1]]
+        ])
+        .on("start brush", (e) => updateChart(e))
+        .on("end", function ({ selection }): void {
+          if (selection !== undefined) {
+            updateChart({ selection }, true);
+            d3.brush().move(d3.select(this), null);
+          }
+        })
+    );
+
+    // 画点
+
     svg
       .selectAll()
       .data(data)
       .enter()
       .append("circle")
+      .attr("data-id", (d) => d.unitId)
+      .attr("class", (d) => `unit-pca unit-${d.unitId}`)
       .attr("cx", (d) => xScale(d.x))
       .attr("cy", (d) => yScale(d.y))
       .attr("r", 2)
-      .attr("fill", "#aaa");
+      .attr("fill", (d) => colorScaler(d.rul))
+      .style("cursor", "pointer")
+      .on("mouseover", (e, d) => {
+        d3.select("#tooltip")
+          .html(`unit ${String(d.unitId)}# <br/> Lifetime: ${String(d.rul)}`)
+          .style("visibility", "visible")
+          .style("top", `${d3.pointer(e, document)[1] - 10}px`)
+          .style("left", `${d3.pointer(e, document)[0] + 10}px`);
+        d3.select(`.unit-pca.unit-${d.unitId}`).attr("r", 5);
+      })
+      .on("mousemove", (e): void => {
+        d3.select("#tooltip")
+          .style("top", `${d3.pointer(e, document)[1] - 10}px`)
+          .style("left", `${d3.pointer(e, document)[0] + 10}px`);
+      })
+      .on("mouseleave", (e, d): void => {
+        d3.select("#tooltip")
+          .style("visibility", "hidden")
+          .style("top", "-1000px")
+          .style("left", "-1000px");
+        d3.select(`.unit-pca.unit-${d.unitId}`).attr("r", 2);
+      })
+      .on("click", function (e, d) {
+        const isSelected = d3.select(this).classed("selected-unit");
+        d3.select(this).classed("selected-unit", !isSelected);
+      });
   };
 
   return (
@@ -78,7 +165,6 @@ export const ScatterChart = (props: IProps): JSX.Element => {
       dimensions={dimensions}
       setDimensions={setDimensions}
       setSVG={setSVG}
-      {...props}
     />
   );
 };

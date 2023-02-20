@@ -20,3 +20,22 @@ code {
   border:solid 1px #909090
 }
 
+
+.selected-unit {
+  opacity: 1 !important;
+  fill: #0058ad;
+  stroke: #0058ad;
+  stroke-width: 2px;
+}
+
+
+.selecting-unit {
+  opacity: 1 !important;
+  fill: #0058ad;
+  stroke: #0058ad;
+  stroke-width: 2px;
+}
+
+.selected-model{
+  fill: #edf5ff;
+}

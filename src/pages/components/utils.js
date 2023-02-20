@@ -47,3 +47,15 @@ export const scaleFunction = (domain, range, widthParam, minWidth) => {
     }
   };
 };
+
+export function debounce(func, time) {
+  let timer;
+  const context = this;
+  const args = [...arguments];
+  return () => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(context, args);
+    }, time);
+  };
+}

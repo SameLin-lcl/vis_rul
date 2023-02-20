@@ -1,6 +1,7 @@
 import { IProps } from "./types";
 import React, { useEffect, useLayoutEffect } from "react";
 import * as d3 from "d3";
+import { debounce } from "./utils";
 
 export default function ViewContainer(props: IProps): JSX.Element {
   const {
@@ -21,11 +22,13 @@ export default function ViewContainer(props: IProps): JSX.Element {
       });
     };
 
+    const debouncedUpdateDimensions = debounce(updateDimensions, 500);
+
     if (chartRef !== undefined && typeof setDimensions === "function") {
       updateDimensions();
-      window.addEventListener("resize", updateDimensions);
+      window.addEventListener("resize", debouncedUpdateDimensions);
       return () => {
-        window.removeEventListener("resize", updateDimensions);
+        window.removeEventListener("resize", debouncedUpdateDimensions);
       };
     }
   }, [chartRef, setDimensions]);
@@ -45,6 +48,7 @@ export default function ViewContainer(props: IProps): JSX.Element {
       setSVG?.(svg);
 
       return () => {
+        console.log("## UNMOUNT");
         svg.remove();
       };
     }
@@ -58,6 +62,7 @@ export default function ViewContainer(props: IProps): JSX.Element {
         border: "solid 1px #eee",
         boxSizing: "border-box",
         display: "flex",
+        position: "relative",
         alignItems: "stretch",
         flexDirection: "column",
         overflow: "hidden",

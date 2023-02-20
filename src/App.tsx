@@ -4,6 +4,7 @@ import SettingPanel from "./pages/SettingPanel";
 import ScatterView from "./pages/Scatter";
 import UnitTimeline from "./pages/UnitTimeline";
 import FeatureView from "./pages/FeatureAnalysis";
+import { globalData } from "./mobx/store/globalData";
 
 function App(): JSX.Element {
   return (
@@ -25,8 +26,14 @@ function App(): JSX.Element {
           flexDirection: "column"
         }}
       >
-        <SettingPanel containerStyle={{ width: "20vw", height: "50vh" }} />
-        <Performance containerStyle={{ width: "20vw", height: "50vh" }} />
+        <SettingPanel
+          containerStyle={{ width: "20vw", height: "35vh" }}
+          globalData={globalData}
+        />
+        <Performance
+          containerStyle={{ width: "20vw", height: "65vh" }}
+          globalData={globalData}
+        />
       </div>
       <div
         style={{
@@ -36,8 +43,14 @@ function App(): JSX.Element {
           flexDirection: "column"
         }}
       >
-        <ScatterView containerStyle={{ width: "40vw", height: "50vh" }} />
-        <FeatureView containerStyle={{ width: "40vw", height: "50vh" }} />
+        <ScatterView
+          containerStyle={{ width: "40vw", height: "50vh" }}
+          globalData={globalData}
+        />
+        <FeatureView
+          containerStyle={{ width: "40vw", height: "50vh" }}
+          globalData={globalData}
+        />
       </div>
       <div
         style={{
@@ -49,6 +62,20 @@ function App(): JSX.Element {
       >
         <UnitTimeline containerStyle={{ width: "40vw", height: "100vh" }} />
       </div>
+      <div
+        id={"tooltip"}
+        style={{
+          position: "absolute",
+          padding: 5,
+          borderRadius: 5,
+          background: "#444",
+          color: "#fff",
+          zIndex: 10,
+          visibility: "hidden",
+          top: -1000,
+          left: -1000
+        }}
+      />
     </div>
   );
 }

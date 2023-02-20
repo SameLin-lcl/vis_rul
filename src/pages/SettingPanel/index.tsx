@@ -1,9 +1,11 @@
 // @ts-nocheck
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ViewContainer from "../components/ViewContainer";
 import { FONT_SIZE } from "../../style";
-import { Card, CardProps, Form, Select, Slider } from "antd";
-import { BarChart, ScatterChart } from "./charts";
+import { Button, Card, CardProps, Form, Select, Slider } from "antd";
+import { ScatterChart } from "./charts";
+import { observer } from "mobx-react";
+import * as d3 from "d3";
 
 const MyCard = (props: CardProps): Element => {
   return (
@@ -24,10 +26,41 @@ const MyCard = (props: CardProps): Element => {
   );
 };
 
-export default function SettingPanel(props: any): JSX.Element {
-  const { containerStyle } = props;
+export default observer(function SettingPanel(props: any): JSX.Element {
+  const { containerStyle, globalData } = props;
 
   const [form] = Form.useForm();
+  const [dataset, setDataSet] = useState({
+    name: "FD0001",
+    trainUnits: 67,
+    testUnits: 33
+  });
+
+  useEffect(() => {
+    void globalData.updateModels([]).then((data) => {
+      form.setFieldsValue({
+        models: data.models.map((item) => item.model)
+      });
+    });
+    void globalData.updateUnits().then((data) => {
+      form.setFieldsValue({
+        rul: [data.maxMin.rul.min, data.maxMin.rul.max]
+      });
+    });
+  }, []);
+
+  const handleSelectUnit = (): void => {
+    const selectedUnitIds = [];
+    d3.selectAll(".unit-pca.selected-unit").each(function (e) {
+      selectedUnitIds.push(d3.select(this).attr("data-id"));
+    });
+    globalData.updateSelectedUnits(selectedUnitIds);
+  };
+
+  const handleSubmit = (): void => {
+    const { models, rul } = form.getFieldsValue();
+    globalData.updateUnits({ rul });
+  };
 
   return (
     <ViewContainer title={"Control"} containerStyle={containerStyle}>
@@ -37,22 +70,38 @@ export default function SettingPanel(props: any): JSX.Element {
           boxSizing: "border-box",
           display: "flex",
           flexDirection: "column",
-          padding: "30px 20px 20px 20px",
+          padding: "30px 10px 0px 10px",
           fontSize: FONT_SIZE * 1.6
         }}
       >
-        <MyCard title={"setting"} bodyStyle={{ flex: 1, padding: "5px 20px" }}>
-          <Form labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} form={form}>
+        <MyCard
+          title={"setting"}
+          bodyStyle={{ flex: 1, padding: "5px 20px" }}
+          extra={
+            <Button size="small" type={"text"} onClick={handleSubmit}>
+              submit
+            </Button>
+          }
+        >
+          <Form
+            labelCol={{ span: 6 }}
+            wrapperCol={{ span: 18 }}
+            form={form}
+            onValuesChange={({ rul, models }) => {
+              //
+            }}
+          >
             <Form.Item style={{ marginBottom: 0 }} label={"datasets"}>
-              <Form.Item name={"datasets"} noStyle>
+              <Form.Item name={"datasets"} initialValue={dataset.name} noStyle>
                 <Select
-                  style={{ width: "calc(100% - 100px)" }}
+                  // style={{ width: "calc(100% - 100px)" }}
                   size={"small"}
-                  options={[{ label: "a", value: "a" }]}
+                  options={[{ value: dataset.name }]}
                 />
               </Form.Item>
               <span className="ant-form-text" style={{ marginLeft: 8 }}>
-                units: 111
+                train-units: {dataset.trainUnits} / test-units:{" "}
+                {dataset.testUnits}
               </span>
             </Form.Item>
             <Form.Item
@@ -61,31 +110,49 @@ export default function SettingPanel(props: any): JSX.Element {
               label={"models"}
             >
               <Select
+                maxTagCount={3}
                 mode={"multiple"}
                 size={"small"}
-                options={[{ label: "a", value: "a" }]}
+                options={globalData._models.map((item) => ({
+                  value: item
+                }))}
               />
             </Form.Item>
 
-            <Form.Item style={{ marginBottom: 0 }} name="RUL" label="RUL">
+            <Form.Item style={{ marginBottom: 0 }} name="rul" label="RUL">
               <Slider
                 range
-                value={[10, 60]}
-                max={110}
-                min={0}
-                marks={{ 0: "0", 110: "110" }}
+                max={globalData.unitsMaxMin?.rul?.max}
+                min={globalData.unitsMinMin?.rul?.min}
+                size={"small"}
+                marks={{
+                  [globalData.unitsMaxMin?.rul?.min]:
+                    globalData.unitsMaxMin?.rul?.min,
+                  [globalData.unitsMaxMin?.rul?.max]:
+                    globalData.unitsMaxMin?.rul?.max
+                }}
               />
             </Form.Item>
           </Form>
         </MyCard>
 
-        <MyCard title={"units"}>
-          <ScatterChart />
+        <MyCard
+          title={"units"}
+          extra={
+            <Button size="small" type={"text"} onClick={handleSelectUnit}>
+              submit
+            </Button>
+          }
+        >
+          <ScatterChart
+            units={globalData.units}
+            unitsMaxMin={globalData.unitsMaxMin}
+          />
         </MyCard>
-        <MyCard title={"features"}>
-          <BarChart />
-        </MyCard>
+        {/* <MyCard title={"features"}> */}
+        {/*  <BarChart /> */}
+        {/* </MyCard> */}
       </div>
     </ViewContainer>
   );
-}
+});

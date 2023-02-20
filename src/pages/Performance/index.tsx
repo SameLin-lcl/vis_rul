@@ -1,30 +1,38 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import ViewContainer from "../components/ViewContainer";
-import { MAX_PERF_DATA, mockPerfData } from "./mock";
 import { DataType } from "./type";
 import * as d3 from "d3";
 import { COLORS, FONT_SIZE, PRIMARY_COLOR } from "../../style";
 import { MARGIN } from "../constant";
 import { RectType } from "../type";
+import { observer } from "mobx-react";
 
 const BAR_WIDTH = 10;
 
-export default function Performance(props: any): JSX.Element {
-  const { containerStyle } = props;
+export default observer(function Performance(props: any): JSX.Element {
+  const { containerStyle, globalData } = props;
 
   const chartRef: any = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [svg, setSVG] = useState(d3.create("svg"));
-  const data = mockPerfData;
+
+  useEffect(() => {
+    globalData.updateInstance();
+  }, []);
 
   useLayoutEffect(() => {
+    console.log("LOADING PERF");
     if (svg !== null && dimensions.width !== 0) {
-      draw(data);
+      if (globalData.models.length > 0) {
+        draw(globalData.models);
+      } else {
+        svg.append("text").text("no data");
+      }
       return () => {
         svg.selectAll("*").remove();
       };
     }
-  }, [svg, data, dimensions]);
+  }, [svg, globalData.models, dimensions]);
 
   const drawFeature = (
     data: DataType[],
@@ -54,7 +62,7 @@ export default function Performance(props: any): JSX.Element {
 
     const xScale = d3
       .scaleLinear()
-      .domain([0, MAX_PERF_DATA.showNum])
+      .domain([0, data[0].perf.length])
       .range([rect.left, rect.right]);
 
     const tooltip = d3
@@ -281,11 +289,11 @@ export default function Performance(props: any): JSX.Element {
     const rowHeight = yScale.step() - 10;
 
     const valueScales = Object.fromEntries(
-      MAX_PERF_DATA.perf.map(({ label, value }) => [
+      globalData.modelsMaxMin.perf.map(({ label, max }: any) => [
         label,
         d3
           .scaleLinear()
-          .domain([0, value])
+          .domain([0, max / 0.8])
           .range([0, prefWidth - rectMargin * 2])
       ])
     );
@@ -299,7 +307,8 @@ export default function Performance(props: any): JSX.Element {
         svg
           .append("rect")
           .attr("x", xPos + rectMargin)
-          .attr("y", yPos + +FONT_SIZE / 2)
+          // .attr("y", yPos + +FONT_SIZE / 2)
+          .attr("y", yPos)
           .attr("width", prefWidth - rectMargin * 2)
           .attr("height", BAR_WIDTH)
           .style("fill", "transparent")
@@ -309,18 +318,19 @@ export default function Performance(props: any): JSX.Element {
         svg
           .append("rect")
           .attr("x", xPos + rectMargin)
-          .attr("y", yPos + +FONT_SIZE / 2)
+          // .attr("y", yPos + +FONT_SIZE / 2)
+          .attr("y", yPos)
           .attr("width", valueScales[label](value))
           .attr("height", BAR_WIDTH)
           .style("fill", PRIMARY_COLOR);
 
-        svg
-          .append("text")
-          .text(value)
-          .attr("x", xPos + rectMargin)
-          .attr("y", yPos)
-          .style("fill", "#555555")
-          .attr("font-size", FONT_SIZE - 1);
+        // svg
+        //   .append("text")
+        //   .text(value)
+        //   .attr("x", xPos + rectMargin)
+        //   .attr("y", yPos)
+        //   .style("fill", "#555555")
+        //   .attr("font-size", FONT_SIZE - 1);
       });
     });
   };
@@ -334,7 +344,7 @@ export default function Performance(props: any): JSX.Element {
   ): void => {
     const prefWidth = xScale.step();
 
-    MAX_PERF_DATA.perf.forEach(({ label: pref }, index) => {
+    globalData.modelsMaxMin.perf.forEach(({ label: pref }: any) => {
       g.append("text")
         .text(pref)
         .attr("x", (xScale(pref) as number) + prefWidth / 2)
@@ -353,7 +363,7 @@ export default function Performance(props: any): JSX.Element {
   ): void => {
     const rowHeight = yScale.step() - 10;
 
-    MAX_PERF_DATA.models.forEach((model, index: number) => {
+    data.forEach(({ model }: any, index: number) => {
       g.append("text")
         .text(model)
         .attr("x", rect.right - 10)
@@ -361,6 +371,44 @@ export default function Performance(props: any): JSX.Element {
         .attr("text-anchor", "end")
         .attr("font-size", FONT_SIZE);
     });
+  };
+
+  const drawPanel = (
+    g: any,
+    data: DataType[],
+    rect: RectType,
+    xScale: any,
+    yScale: any
+  ): void => {
+    const height = yScale.step();
+
+    const panels = g
+      .selectAll()
+      .data(data)
+      .enter()
+      .append("rect")
+      .attr("class", "model-panel")
+      .classed("selected-model", (d: any) =>
+        globalData.selectedModels.includes(d.model)
+      )
+      .attr("x", rect.left)
+      .attr("y", (d: any) => +yScale(d.model) + 5)
+      .attr("fill", "#fff")
+      .attr("width", rect.right - rect.left)
+      .attr("height", height - 10)
+      .style("cursor", "pointer");
+
+    panels.each(function (d: any) {
+      // @ts-expect-error
+      const _this = d3.select(this);
+      _this.on("click", (e: any, d: any) => {
+        const isSelected = _this.classed("selected-model");
+        _this.classed("selected-model", !isSelected);
+        globalData.updateSelectedModel(d.model, !isSelected);
+      });
+    });
+
+    //
   };
 
   const draw = (data: DataType[]): void => {
@@ -380,18 +428,31 @@ export default function Performance(props: any): JSX.Element {
     const yPosScale = d3
       .scaleBand()
       .paddingInner(mainRect.yGap)
-      .domain([...MAX_PERF_DATA.models, ""])
+      .domain([...data.map((item: any) => item.model), ""])
       .range([mainRect.top, mainRect.bottom]);
 
     const xPosScale = d3
       .scaleBand()
       .paddingInner(mainRect.xGap)
-      .domain([...MAX_PERF_DATA.perf.map((item) => item.label), ""])
+      .domain([...data[0].perf.map((item) => item.label), ""])
       .range([mainRect.left, mainRect.right]);
+
+    drawPanel(
+      svg.append("g"),
+      data,
+      {
+        left: MARGIN.left,
+        top: MARGIN.top,
+        right: dimensions.width - MARGIN.right,
+        bottom: dimensions.height - MARGIN.bottom
+      },
+      xPosScale,
+      yPosScale
+    );
 
     drawLabelLeft(
       svg.append("g"),
-      [],
+      data,
       {
         left: MARGIN.left,
         top: mainRect.top,
@@ -404,7 +465,7 @@ export default function Performance(props: any): JSX.Element {
 
     drawLabelTop(
       svg.append("g"),
-      [],
+      data,
       {
         left: mainRect.left,
         top: MARGIN.top,
@@ -440,4 +501,4 @@ export default function Performance(props: any): JSX.Element {
       setSVG={setSVG}
     ></ViewContainer>
   );
-}
+});
