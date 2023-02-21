@@ -27,11 +27,11 @@ function App(): JSX.Element {
         }}
       >
         <SettingPanel
-          containerStyle={{ width: "20vw", height: "35vh" }}
+          containerStyle={{ width: "15vw", height: "35vh" }}
           globalData={globalData}
         />
         <Performance
-          containerStyle={{ width: "20vw", height: "65vh" }}
+          containerStyle={{ width: "15vw", height: "65vh" }}
           globalData={globalData}
         />
       </div>
@@ -60,7 +60,10 @@ function App(): JSX.Element {
           flexDirection: "column"
         }}
       >
-        <UnitTimeline containerStyle={{ width: "40vw", height: "100vh" }} />
+        <UnitTimeline
+          containerStyle={{ width: "45vw", height: "100vh" }}
+          globalData={globalData}
+        />
       </div>
       <div
         id={"tooltip"}

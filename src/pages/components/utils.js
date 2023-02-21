@@ -1,14 +1,10 @@
-import { MAX_FEATURE_DATA } from "../FeatureAnalysis/mock";
-
-export const culFeatureImportance = (data) => {
-  const importance = Array(MAX_FEATURE_DATA.length)
-    .fill(0)
-    .map((_, i) => {
-      return (
-        data.reduce((s, d) => s + Math.abs(d.features[i].importance), 0) /
-        data.length
-      );
-    });
+export const culFeatureImportance = (featureInfo) => {
+  const importance = featureInfo.map((feature, i) => {
+    return (
+      feature.overImportance.reduce((s, d) => s + Math.abs(d.importance), 0) /
+      feature.overImportance.length
+    );
+  });
 
   return importance;
 };

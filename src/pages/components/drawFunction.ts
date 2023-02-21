@@ -1,6 +1,7 @@
 import { DataType } from "../Scatter/type";
 import * as d3 from "d3";
 import { UnitColor } from "../constant";
+import { COLORS } from "../../style";
 
 type ScaleType = (x?: number) => number;
 
@@ -15,6 +16,7 @@ export const drawGlyph = (props: {
   onlyUnit?: boolean;
   classPrefix?: string;
   event?: any;
+  backRef?: boolean;
 }): void => {
   const {
     svg,
@@ -25,6 +27,7 @@ export const drawGlyph = (props: {
     modelPerf = 100,
     onlyRul = false,
     onlyUnit = false,
+    backRef = true,
     classPrefix = "instance-glyph",
     event
   } = props;
@@ -32,8 +35,9 @@ export const drawGlyph = (props: {
   const ARC_IN_RADIUS = radius / (onlyRul ? 8 : 4);
   const ARC_OUT_RADIUS_RUL = radius / (onlyRul ? 3 : 2);
   const ARC_OUT_RADIUS = radius;
-  const COLORS = ["#5bd1d7", "#348498", "#3b9a9c", "#a696c8"];
   const ARC_MARGIN = Math.PI * 0.02;
+
+  const g = svg.append("g");
 
   const handleMouseOver = (e: any): void => {
     d3.select("#tooltip")
@@ -68,27 +72,61 @@ export const drawGlyph = (props: {
     event?.mouseLeave?.(e, d);
   };
 
+  const handleClick = function (e: any): void {
+    event?.click?.(e, d);
+  };
+
+  const handleDbClick = (e: any): void => {
+    event?.dbclick?.(e, d);
+  };
+
   if (onlyUnit) {
-    svg
-      .append("circle")
+    g.append("circle")
       .attr("cx", xScale(d.x))
       .attr("cy", yScale(d.y))
       .attr("r", ARC_IN_RADIUS)
-      .attr("fill", UnitColor(d.unitId as number))
-      .on("mouseover", handleMouseOver)
-      .on("mousemove", handleMouseMove)
-      .on("mouseleave", handleMouseLeave);
+      .attr("fill", UnitColor(d.unitId as number));
     return;
   }
+
+  // 画 RUL
+  //
+  // const defs = svg.append("defs");
+  // const clipPath = defs.append("clipPath").attr("id", "myClip");
+  //
+  // const rulScale = d3
+  //   .scaleLinear()
+  //   .domain([0, d.rulMax ?? 0])
+  //   .range([ARC_IN_RADIUS * 2, 0]);
+  //
+  // clipPath
+  //   .append("circle")
+  //   .attr("cx", ARC_IN_RADIUS)
+  //   .attr("cy", ARC_IN_RADIUS)
+  //   .attr("r", ARC_IN_RADIUS);
+  //
+  // svg
+  //   .append("rect")
+  //   .attr("x", 0)
+  //   .attr("y", rulScale(d.rul))
+  //   .attr(
+  //     "transform",
+  //     `translate(${xScale(d.x) - ARC_IN_RADIUS}, ${
+  //       yScale(d.y) - ARC_IN_RADIUS
+  //     })`
+  //   )
+  //   .attr("width", ARC_IN_RADIUS * 2)
+  //   .attr("height", ARC_IN_RADIUS * 2)
+  //   .attr("fill", "#b2b2b2")
+  //   .attr("clip-path", "url(#myClip)");
+  // return;
 
   const arcScale = d3
     .scaleLinear()
     .domain([0, d.rulMax ?? 0])
     .range([Math.PI, Math.PI * (onlyRul ? 3 : 2)]);
 
-  svg
-    .append("path")
-    .attr("class", `${classPrefix}-${String(d.instanceId ?? 0)}`)
+  g.append("path")
     .attr("transform", `translate(${xScale(d.x)}, ${yScale(d.y)})`)
     .attr("fill", "transparent")
     .attr("stroke-width", "0.5")
@@ -103,16 +141,11 @@ export const drawGlyph = (props: {
         .endAngle(Math.PI * (onlyRul ? 3 : 2))
         .padAngle(0)
         .cornerRadius(0)
-    )
-    .on("mouseover", handleMouseOver)
-    .on("mousemove", handleMouseMove)
-    .on("mouseleave", handleMouseLeave);
+    );
 
-  svg
-    .append("path")
-    .attr("class", `${classPrefix}-${String(d.instanceId ?? 0)}`)
+  g.append("path")
     .attr("transform", `translate(${xScale(d.x)}, ${yScale(d.y)})`)
-    .attr("fill", "gray")
+    .attr("fill", "#bdc3c7")
     .attr(
       "d",
       d3
@@ -123,14 +156,7 @@ export const drawGlyph = (props: {
         .endAngle(arcScale(d.rul))
         .padAngle(0)
         .cornerRadius(0)
-    )
-    .on("mouseover", handleMouseOver)
-    .on("mousemove", handleMouseMove)
-    .on("mouseleave", handleMouseLeave);
-
-  if (onlyRul) {
-    return;
-  }
+    );
 
   // 画模型圆弧
   const posScale = d3
@@ -143,10 +169,27 @@ export const drawGlyph = (props: {
     .domain([modelPerf, 0])
     .range([ARC_IN_RADIUS, ARC_OUT_RADIUS]);
 
+  if (backRef) {
+    g.append("path")
+      .attr("transform", `translate(${xScale(d.x)}, ${yScale(d.y)})`)
+      .attr("fill", "transparent")
+      .attr("stroke-width", "0.3")
+      .attr("stroke", "gray")
+      .attr(
+        "d",
+        d3
+          .arc()
+          .innerRadius(ARC_IN_RADIUS)
+          .outerRadius(ARC_OUT_RADIUS)
+          .startAngle(0)
+          .endAngle(Math.PI)
+          .padAngle(0)
+          .cornerRadius(0)
+      );
+  }
+
   d.modelPerf.forEach(({ label, value }, index: number) => {
-    svg
-      .append("path")
-      .attr("class", `${classPrefix}-${String(d.instanceId ?? 0)}`)
+    g.append("path")
       .attr("transform", `translate(${xScale(d.x)}, ${yScale(d.y)})`)
       .attr("fill", COLORS[index])
       .attr(
@@ -159,9 +202,14 @@ export const drawGlyph = (props: {
           .endAngle(posScale(1 + index) - ARC_MARGIN)
           .padAngle(0)
           .cornerRadius(0)
-      )
-      .on("mouseover", handleMouseOver)
-      .on("mousemove", handleMouseMove)
-      .on("mouseleave", handleMouseLeave);
+      );
   });
+
+  g.datum(d)
+    .attr("class", `${classPrefix} ${classPrefix}-${String(d.instanceId ?? 0)}`)
+    .on("mouseover", handleMouseOver)
+    .on("mousemove", handleMouseMove)
+    .on("mouseleave", handleMouseLeave)
+    .on("click", handleClick)
+    .on("dblclick", handleDbClick);
 };

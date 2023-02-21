@@ -38,7 +38,6 @@ export const fetchUnitsPca = (params = { rul: [1, 340] }) => {
 };
 
 export const fetchInstances = (params) => {
-  console.log(params);
   // if (IS_MOCK) return Promise.resolve(mockFetchInstances(params));
   return request({
     method: "get",
@@ -51,10 +50,26 @@ export const fetchInstances = (params) => {
   }).then((res) => res.data.data);
 };
 
-export const fetchData = (params) => {
+export const fetchFeatures = (params) => {
+  // if (IS_MOCK) return Promise.resolve(mockFetchFeatures(params));
   return request({
     method: "get",
-    url: "/queryTestData",
-    params
-  }).then((res) => res.data);
+    url: "/queryInstanceFeatures",
+    params: {
+      instances: JSON.stringify(params?.instances),
+      models: JSON.stringify(params?.models)
+    }
+  }).then((res) => res.data.data);
+};
+
+export const fetchInstanceTimeline = (params) => {
+  // if (IS_MOCK) return Promise.resolve(mockFetchInstanceTimeline(params));
+  return request({
+    method: "get",
+    url: "/queryInstanceTimeline",
+    params: {
+      input: params?.input,
+      models: JSON.stringify(params?.models)
+    }
+  }).then((res) => res.data.data);
 };

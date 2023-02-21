@@ -13,9 +13,10 @@ export const mockNodeData = () => {
     x: _.random(MAX_SCATTER_DATA.x),
     y: _.random(MAX_SCATTER_DATA.y),
     rul: _.random(MAX_SCATTER_DATA.rul),
-    modelPerf: Array(MAX_SCATTER_DATA.modelNum)
-      .fill(0)
-      .map(() => _.random(MAX_SCATTER_DATA.modelPerf))
+    modelPerf: ["RF", "LSTM", "MLP"].map((item) => ({
+      label: item,
+      value: _.random(MAX_SCATTER_DATA.modelPerf)
+    }))
   };
 };
 

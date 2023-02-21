@@ -1,24 +1,38 @@
 import { makeAutoObservable } from "mobx";
-import { fetchInstances, fetchModels, fetchUnitsPca } from "../api/api";
+import {
+  fetchFeatures,
+  fetchInstances,
+  fetchInstanceTimeline,
+  fetchModels,
+  fetchUnitsPca
+} from "../api/api";
 
 class GlobalData {
   units = [];
   unitsMaxMin = {};
 
+  features = [];
   _models = [];
 
   models = [];
   modelsMaxMin = {};
 
+  win = 1;
   instances = [];
   instancesMaxMin = {};
 
-  win = 1;
+  instanceImportance = [];
+  featureImportance = [];
 
   selectedUnits = [];
   selectedModels = [];
+  selectedInstances = [];
+  selectedInput;
 
-  features = [];
+  importanceMaxMin = {};
+
+  timelineData;
+  timelineDataRandom = [];
 
   constructor() {
     makeAutoObservable(this);
@@ -63,6 +77,7 @@ class GlobalData {
       );
     }
     this.updateInstance();
+    this.updateTimeline();
   }
 
   updateInstance() {
@@ -74,10 +89,56 @@ class GlobalData {
       (data) => {
         this.instances = data.instances;
         this.instancesMaxMin = data.maxMin;
-        console.log(data.maxMin.modelPerf);
       },
       () => undefined
     );
+  }
+
+  updateSelectedInstance(instanceId) {
+    let isSelected = false;
+    if (Array.isArray(instanceId)) {
+      this.selectedInstances = instanceId;
+    } else {
+      const _id = this.selectedInstances.indexOf(instanceId);
+      if (_id !== -1) {
+        isSelected = true;
+        this.selectedInstances.splice(_id, 1);
+      } else {
+        this.selectedInstances.push(instanceId);
+      }
+    }
+    this.updateInstanceFeatures();
+    return isSelected;
+  }
+
+  updateInstanceFeatures() {
+    if (this.selectedInstances.length > 0 && this.selectedModels.length > 0) {
+      fetchFeatures({
+        instances: this.selectedInstances,
+        models: this.selectedModels
+      }).then((data) => {
+        this.instanceImportance = data.instances;
+        this.featureImportance = data.features;
+        this.importanceMaxMin = data.maxMin;
+      });
+    }
+  }
+
+  updateSelectedInput(instanceId) {
+    this.selectedInput = instanceId;
+    this.updateTimeline();
+  }
+
+  updateTimeline() {
+    if (this.selectedInput && this.selectedModels.length > 0) {
+      fetchInstanceTimeline({
+        models: this.selectedModels,
+        input: this.selectedInput
+      }).then((data) => {
+        this.timelineData = data;
+        this.timelineDataRandom = Math.random();
+      });
+    }
   }
 
   updateFeature(features) {

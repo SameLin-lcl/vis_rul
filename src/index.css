@@ -23,19 +23,34 @@ code {
 
 .selected-unit {
   opacity: 1 !important;
-  fill: #0058ad;
-  stroke: #0058ad;
+  fill: #1677ff;
+  stroke: #1677ff;
   stroke-width: 2px;
 }
 
 
 .selecting-unit {
   opacity: 1 !important;
-  fill: #0058ad;
-  stroke: #0058ad;
+  fill: #1677ff;
+  stroke: #1677ff;
   stroke-width: 2px;
 }
 
+.selected-instance {
+  opacity: 1 !important;
+  fill: #1677ff;
+  stroke: #1677ff;
+  stroke-width: 1px;
+}
+
+
+.selecting-instance {
+  opacity: 1 !important;
+  fill: #1677ff;
+  stroke: #1677ff;
+  stroke-width: 1px;
+}
+
 .selected-model{
-  fill: #edf5ff;
+  fill: #c4deff;
 }

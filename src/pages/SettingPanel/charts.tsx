@@ -81,7 +81,7 @@ export const ScatterChart = ({ units, unitsMaxMin }: any): JSX.Element => {
       if (selection !== undefined) {
         const [[x0, y0], [x1, y1]] = selection;
 
-        const filterFunction = (d: any): void => {
+        const filterFunction = (d: any): boolean => {
           return (
             x0 <= xScale(d.x) &&
             xScale(d.x) < x1 &&

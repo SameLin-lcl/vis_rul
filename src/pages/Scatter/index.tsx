@@ -62,20 +62,64 @@ export default observer(function ScatterView(props: any): JSX.Element {
     //   .attr("transform", `translate(${MARGIN.left}, 0)`)
     //   .call(d3.axisLeft(yScale));
 
+    const updateChart = ({ selection }: any, isSelected = false): any[] => {
+      const selectedInstance: any = [];
+      if (selection?.length > 0) {
+        const [[x0, y0], [x1, y1]] = selection;
+
+        const filterFunction = (d: any): boolean => {
+          const res =
+            x0 <= xScale(d.x) &&
+            xScale(d.x) < x1 &&
+            y0 <= yScale(d.y) &&
+            yScale(d.y) < y1;
+          if (res) {
+            selectedInstance.push(d.instanceId);
+          }
+          return res;
+        };
+
+        if (isSelected) {
+          d3.selectAll(".instance-pca")
+            .classed("selected-instance", false)
+            .classed("selecting-instance", false)
+            .filter(filterFunction)
+            .classed("selected-instance", true);
+        } else {
+          d3.selectAll(".instance-pca").classed(
+            "selecting-instance",
+            filterFunction
+          );
+        }
+      }
+      return selectedInstance;
+    };
+
+    svg.call(
+      d3
+        .brush()
+        .extent([
+          [0, 0],
+          [dimensions.width, dimensions.height]
+          // [xScale.range()[0], yScale.range()[0]],
+          // [xScale.range()[1], yScale.range()[1]]
+        ])
+        .on("start brush", (e) => updateChart(e))
+        .on("end", function ({ selection }): void {
+          if (selection !== undefined) {
+            const selectedInstances = updateChart({ selection }, true);
+            globalData.updateSelectedInstance(selectedInstances);
+            d3.brush().move(d3.select(this), null);
+          }
+        })
+    );
+
+    // 画图
+
     const genUnitPath = d3
       .line()
       .x((d: any, i: number) => xScale(d.x))
       .y((d: any, i: number) => yScale(d.y));
-    // //
-    // if (data.length > 0) {
-    //   svg
-    //     .append("path")
-    //     .attr("class", "unit-line")
-    //     .attr("d", genUnitPath(data))
-    //     .attr("fill", "none")
-    //     .attr("stroke", "#f00")
-    //     .attr("stroke-width", 2);
-    // }
 
     const defs = svg.append("defs");
     const gradient = defs
@@ -110,6 +154,22 @@ export default observer(function ScatterView(props: any): JSX.Element {
       svg.selectAll(".unit-path").remove();
     };
 
+    const mouseClick = (e: any, d: any): void => {
+      const isSelected: boolean = globalData.updateSelectedInstance(
+        d.instanceId
+      );
+      d3.select(`.instance-pca-${String(d.instanceId)}`).classed(
+        "selected-instance",
+        !isSelected
+      );
+      console.log(`instance-pca-${String(d.instanceId)}`, !isSelected);
+      console.log(
+        d3
+          .select(`.instance-pca-${String(d.instanceId)}`)
+          .classed("selected-instance")
+      );
+    };
+
     data.forEach((d) => {
       drawGlyph({
         svg,
@@ -117,13 +177,14 @@ export default observer(function ScatterView(props: any): JSX.Element {
         xScale,
         yScale,
         modelPerf: Math.max(
-          globalData.instancesMaxMin.modelPerf.max,
-          Math.abs(globalData.instancesMaxMin.modelPerf.max)
+          globalData.instancesMaxMin.modelPerf?.max,
+          Math.abs(globalData.instancesMaxMin.modelPerf?.max)
         ),
         radius: 12,
         onlyRul,
         onlyUnit,
-        event: { mouseOver, mouseLeave }
+        classPrefix: "instance-pca",
+        event: { mouseOver, mouseLeave, click: mouseClick }
       });
     });
   };

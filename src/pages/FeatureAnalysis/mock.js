@@ -12,7 +12,6 @@ export const MAX_FEATURE_DATA = Array(FEATURE_NUM)
     return {
       name: `s${i + 1}`,
       overImportance: _.random(-1, 1, true),
-      variance: _.random(0, 1, true),
       maxValue,
       minValue
     };

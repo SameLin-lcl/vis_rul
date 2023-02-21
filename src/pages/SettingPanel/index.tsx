@@ -8,18 +8,20 @@ import { observer } from "mobx-react";
 import * as d3 from "d3";
 
 const MyCard = (props: CardProps): Element => {
+  const { style, ...rest } = props;
+
   return (
     <Card
       style={{
         marginBottom: 10,
-        flex: 1,
         display: "flex",
-        flexDirection: "column"
+        flexDirection: "column",
+        ...style
       }}
       size={"small"}
       bodyStyle={{ flex: 1, padding: 0 }}
       headStyle={{ minHeight: 18 }}
-      {...props}
+      {...rest}
     >
       {props.children}
     </Card>
@@ -76,7 +78,7 @@ export default observer(function SettingPanel(props: any): JSX.Element {
       >
         <MyCard
           title={"setting"}
-          bodyStyle={{ flex: 1, padding: "5px 20px" }}
+          bodyStyle={{ padding: "5px 20px" }}
           extra={
             <Button size="small" type={"text"} onClick={handleSubmit}>
               submit
@@ -137,6 +139,7 @@ export default observer(function SettingPanel(props: any): JSX.Element {
         </MyCard>
 
         <MyCard
+          style={{ flex: 1 }}
           title={"units"}
           extra={
             <Button size="small" type={"text"} onClick={handleSelectUnit}>

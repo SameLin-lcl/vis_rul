@@ -32,7 +32,7 @@ export default observer(function Performance(props: any): JSX.Element {
         svg.selectAll("*").remove();
       };
     }
-  }, [svg, globalData.models, dimensions]);
+  }, [svg, globalData.models, globalData.selectedModels, dimensions]);
 
   const drawFeature = (
     data: DataType[],
