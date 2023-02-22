@@ -21,7 +21,8 @@ export const mockFetchModels = () => {
           max: 100
         }
       ],
-      features: { max: 100, min: 0 },
+      // features: { max: 100, min: 0 },
+      deviation: { max: 100, min: 0 },
       variance: { max: 100, min: 0 }
     },
     models: ["RF", "SVR", "LSTM", "CNN", "MLP"].map((item) => ({
@@ -40,12 +41,12 @@ export const mockFetchModels = () => {
           value: _.random(0, 100)
         }
       ],
-      features: Array(10)
+      deviation: Array(5)
         .fill(0)
         .map((d, i) => ({
-          label: "s_" + i,
-          value: _.random(0, 1, true),
-          variance: _.random(0, 1, true)
+          label: "0 - 100",
+          value: _.random(0, 100, true),
+          variance: _.random(0, 100, true)
         }))
     }))
   };

@@ -11,5 +11,5 @@ export const MARGIN = {
 
 export const UnitColor = d3
   .scaleLinear()
-  .domain([0, 33])
-  .range(["#ff0000", "#00ff00"]);
+  .domain([0, 100])
+  .range(["#dcdcdc", "#239df2"]);

@@ -277,6 +277,108 @@ export default observer(function Performance(props: any): JSX.Element {
     });
   };
 
+  const drawUnitDeviation = (
+    data: DataType[],
+    rect: {
+      left: number;
+      top: number;
+      right: number;
+      bottom: number;
+    },
+    yPosScale: any
+  ): void => {
+    svg
+      .append("text")
+      .text("Deviation")
+      .attr("x", (rect.right + rect.left) / 2)
+      .attr("y", rect.top - 10)
+      .attr("text-anchor", "middle")
+      .attr("font-size", FONT_SIZE);
+
+    const padding = yPosScale.step() * 0.1;
+    const barHeight = yPosScale.step() * 0.4;
+    const width = (rect.right - rect.left) / data[0].deviation.length;
+
+    const valueScale = d3
+      .scaleLinear()
+      .domain([
+        globalData.modelsMaxMin.deviation.min,
+        globalData.modelsMaxMin.deviation.max
+      ])
+      .range([0, barHeight]);
+
+    const xScale = d3
+      .scaleLinear()
+      .domain([0, data[0].deviation.length])
+      .range([rect.left, rect.right]);
+
+    const varianceScale = d3
+      .scaleLinear()
+      .domain([
+        globalData.modelsMaxMin.variance.min,
+        globalData.modelsMaxMin.variance.max
+      ])
+      .range([0, width * 0.4]);
+
+    data.forEach((d: DataType) => {
+      const yPos: number = yPosScale(d.model);
+      const g = svg.append("g");
+
+      d.deviation.forEach(({ label, value, variance }, i) => {
+        const sg = g
+          .append("g")
+          .on("mouseover", (e): void => {
+            d3.select("#tooltip")
+              .html(
+                `RUL: ${String(label)}# <br /> value: ${String(
+                  value
+                )} <br /> variance:  ${String(variance)}`
+              )
+              .style("visibility", "visible")
+              .style("top", `${d3.pointer(e, document)[1] - 10}px`)
+              .style("left", `${d3.pointer(e, document)[0] + 10}px`);
+          })
+          .on("mousemove", (e): void => {
+            d3.select("#tooltip")
+
+              .style("top", `${d3.pointer(e, document)[1] - 10}px`)
+              .style("left", `${d3.pointer(e, document)[0] + 10}px`);
+          })
+          .on("mouseleave", (): void => {
+            d3.select("#tooltip")
+              .style("visibility", "hidden")
+              .style("top", "-1000px")
+              .style("left", "-1000px");
+          });
+
+        sg.append("rect")
+          .attr("x", xScale(i) + width * 0.1)
+          .attr("y", yPos + padding)
+          .attr("width", width * 0.8)
+          .attr("height", barHeight)
+          .style("fill", "#f8f8f8")
+          .style("opacity", 0.4);
+
+        /*****
+         *
+         * 绘制特征重要性
+         */
+        sg.append("rect")
+          .attr("x", xScale(i) + width * 0.1)
+          .attr("y", yPos + padding + +barHeight - valueScale(value))
+          .attr("width", width * 0.8)
+          .attr("height", Math.abs(valueScale(value)))
+          .style("fill", COLORS[i]);
+
+        sg.append("circle")
+          .attr("cx", xScale(i) + width / 2)
+          .attr("cy", yPos + barHeight + padding + width / 2 + 1)
+          .attr("r", varianceScale(variance))
+          .style("fill", COLORS[i]);
+      });
+    });
+  };
+
   const drawMainChart = (
     g: any,
     data: DataType[],
@@ -322,7 +424,7 @@ export default observer(function Performance(props: any): JSX.Element {
           .attr("y", yPos)
           .attr("width", valueScales[label](value))
           .attr("height", BAR_WIDTH)
-          .style("fill", PRIMARY_COLOR);
+          .style("fill", "#239ef4");
 
         // svg
         //   .append("text")
@@ -479,7 +581,8 @@ export default observer(function Performance(props: any): JSX.Element {
     drawMainChart(svg.append("g"), data, mainRect, xPosScale, yPosScale);
 
     // drawFeature(
-    drawFeatureCircle(
+    // drawFeatureCircle(
+    drawUnitDeviation(
       data,
       {
         left: mainRect.right,

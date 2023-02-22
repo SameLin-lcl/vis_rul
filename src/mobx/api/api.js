@@ -10,7 +10,7 @@ const request = axios.create({
 const IS_MOCK = true;
 
 /**
- * @returns {Promise<axios.AxiosResponse<any>>}
+ * @returns {Promise<{maxMin: {features: {min: number, max: number}, variance: {min: number, max: number}, perf: [{max: number, label: string},{max: number, label: string},{max: number, label: string}]}, models: {features: *, model: *, perf: [{label: string, value: number},{label: string, value: number},{label: string, value: number}]}[]}>}
  */
 
 export const fetchModels = () => {

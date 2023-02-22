@@ -13,6 +13,7 @@ export interface DataType {
   model: string;
   perf: PrefType[];
   features: FeatureType[];
+  deviation: FeatureType[];
 }
 
 export interface RectType {

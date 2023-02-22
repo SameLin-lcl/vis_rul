@@ -30,7 +30,7 @@ export const ScatterChart = ({ units, unitsMaxMin }: any): JSX.Element => {
   ): void => {
     const LABEL_BOTTOM_HEIGHT = 2;
     const LABEL_LEFT_WIDTH = 2;
-    const CHART_PADDING = 5;
+    const CHART_PADDING = 15;
 
     const mainRect = {
       left: CHART_PADDING + LABEL_LEFT_WIDTH,

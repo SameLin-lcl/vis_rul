@@ -76,7 +76,8 @@ function App(): JSX.Element {
           zIndex: 10,
           visibility: "hidden",
           top: -1000,
-          left: -1000
+          left: -1000,
+          fontSize: 12
         }}
       />
     </div>
