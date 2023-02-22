@@ -280,7 +280,7 @@ export default observer(function FeatureView(props: any): JSX.Element {
         .attr("cx", (d: any, i: number) => xScale(i + 1))
         .attr("cy", (d: any, i: number) => valueScales[i + 1](d.value))
         .attr("r", calRadio)
-        .style("fill", "#bfdaee")
+        .style("fill", "#c4def0")
         .style("opacity", 0.4)
         .attr(
           "class",
@@ -358,11 +358,12 @@ export default observer(function FeatureView(props: any): JSX.Element {
         const root = d3.hierarchy(data).sum((d: any) => Math.abs(d.value));
         // @ts-expect-error
         const nodes = pack(root).descendants();
+
         svg
           .selectAll()
           .data(nodes)
           .join("circle")
-          .attr("class", "join-circle")
+          .attr("class", "join-glyph")
           .attr("cx", (d: any) => d.x)
           .attr("cy", (d: any) => d.y)
           .attr("r", (d: any) => Math.max(0, d.r - 1.5))
@@ -373,16 +374,16 @@ export default observer(function FeatureView(props: any): JSX.Element {
           .attr("fill", (d: any, i) => {
             return d.children === undefined ? COLORS[i - 1] : "#fff";
           })
-          .attr("stroke", (d: any, i) => {
-            return d.children === undefined
-              ? d.data.raw > 0
-                ? "#f6d8ab"
-                : "#f1b6af"
-              : "#a0a0a0";
-          })
-          .attr("stroke-width", (d: any, i) => {
-            return d.children === undefined ? 3 : 0.5;
-          })
+          // .attr("stroke", (d: any, i) => {
+          //   return d.children === undefined
+          //     ? d.data.raw > 0
+          //       ? "#f6d8ab"
+          //       : "#f1b6af"
+          //     : "#a0a0a0";
+          // })
+          // .attr("stroke-width", (d: any, i) => {
+          //   return d.children === undefined ? 3 : 0.5;
+          // })
           .attr("opacity", 1)
           .on("mouseover", (e: any, d: any) => {
             d3.select("#tooltip")
@@ -391,6 +392,34 @@ export default observer(function FeatureView(props: any): JSX.Element {
               .style("top", `${d3.pointer(e, document)[1] - 10}px`)
               .style("left", `${d3.pointer(e, document)[0] + 10}px`);
           });
+
+        svg
+          .selectAll()
+          .data(nodes)
+          .join("rect")
+          .attr("class", "join-glyph")
+          .attr("x", (d: any) => d.x - d.r * 0.5)
+          .attr("y", (d: any) => d.y - 0.5)
+          .attr("transform", (d: any) => `translate(${x - r}, ${y - r})`)
+          .attr("width", (d: any) => {
+            return d.children === undefined ? d.r : 0;
+          })
+          .attr("height", 1)
+          .attr("fill", "#fff");
+
+        svg
+          .selectAll()
+          .data(nodes)
+          .join("rect")
+          .attr("class", "join-glyph")
+          .attr("x", (d: any) => d.x - 0.5)
+          .attr("y", (d: any) => d.y - d.r * 0.5)
+          .attr("transform", (d: any) => `translate(${x - r}, ${y - r})`)
+          .attr("width", 1)
+          .attr("height", (d: any) => {
+            return d.children === undefined && d.data.raw > 0 ? d.r : 0;
+          })
+          .attr("fill", "#fff");
       });
     };
 
@@ -407,7 +436,7 @@ export default observer(function FeatureView(props: any): JSX.Element {
         "opacity",
         0.2
       );
-      d3.selectAll(".join-circle").remove();
+      d3.selectAll(".join-glyph").remove();
     };
 
     drawLabelTop(

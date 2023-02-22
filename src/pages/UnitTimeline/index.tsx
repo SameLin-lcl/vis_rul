@@ -198,7 +198,7 @@ export default observer(function UnitTimeline(props: any): JSX.Element {
     const backColorScale = d3
       .scaleLinear()
       .domain([1, 0])
-      .range(["#fff", "#aaa"]);
+      .range(["#fff", "#8a8a8a"]);
 
     const lineColorScale = d3
       .scaleLinear()
