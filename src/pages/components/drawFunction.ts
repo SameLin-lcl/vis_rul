@@ -39,11 +39,13 @@ export const drawGlyph = (props: {
 
   const g = svg.append("g");
 
-  const handleMouseOver = (e: any): void => {
+  const handleMouseOver = (e: any, useEvent = true): void => {
     d3.select("#tooltip")
       .html(
         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        `instance ${String(d.instanceId)}# <br/> RUL: ${String(d.rul)}` +
+        `instance ${String(d.instanceId)}# <br/> Unit: ${String(
+          d.unitId
+        )} <br/> RUL: ${String(d.rul)}` +
           d.modelPerf
             .map(
               ({ label, value }: any) =>
@@ -54,22 +56,22 @@ export const drawGlyph = (props: {
       .style("visibility", "visible")
       .style("top", `${d3.pointer(e, document)[1] - 10}px`)
       .style("left", `${d3.pointer(e, document)[0] + 10}px`);
-    event?.mouseOver?.(e, d);
+    useEvent && event?.mouseOver?.(e, d);
   };
 
-  const handleMouseMove = (e: any): void => {
+  const handleMouseMove = (e: any, useEvent = true): void => {
     d3.select("#tooltip")
       .style("top", `${d3.pointer(e, document)[1] - 10}px`)
       .style("left", `${d3.pointer(e, document)[0] + 10}px`);
-    event?.mouseMove?.(e, d);
+    useEvent && event?.mouseMove?.(e, d);
   };
 
-  const handleMouseLeave = (e: any): void => {
+  const handleMouseLeave = (e: any, useEvent = true): void => {
     d3.select("#tooltip")
       .style("visibility", "hidden")
       .style("top", "-1000px")
       .style("left", "-1000px");
-    event?.mouseLeave?.(e, d);
+    useEvent && event?.mouseLeave?.(e, d);
   };
 
   const handleClick = function (e: any): void {
@@ -85,7 +87,16 @@ export const drawGlyph = (props: {
       .attr("cx", xScale(d.x))
       .attr("cy", yScale(d.y))
       .attr("r", ARC_IN_RADIUS)
-      .attr("fill", UnitColor(d.unitId as number));
+      .attr("fill", UnitColor(d.unitId as number))
+      .attr(
+        "class",
+        `${classPrefix} ${classPrefix}-${String(d.instanceId ?? 0)}`
+      )
+      .on("mouseover", (e: any) => handleMouseOver(e, false))
+      .on("mousemove", (e: any) => handleMouseMove(e, false))
+      .on("mouseleave", (e: any) => handleMouseLeave(e, false))
+      .on("click", handleClick)
+      .on("dblclick", handleDbClick);
     return;
   }
 
@@ -141,7 +152,13 @@ export const drawGlyph = (props: {
         .endAngle(Math.PI * (onlyRul ? 3 : 2))
         .padAngle(0)
         .cornerRadius(0)
-    );
+    )
+    .attr("class", `${classPrefix} ${classPrefix}-${String(d.instanceId ?? 0)}`)
+    .on("mouseover", handleMouseOver)
+    .on("mousemove", handleMouseMove)
+    .on("mouseleave", handleMouseLeave)
+    .on("click", handleClick)
+    .on("dblclick", handleDbClick);
 
   g.append("path")
     .attr("transform", `translate(${xScale(d.x)}, ${yScale(d.y)})`)
@@ -157,6 +174,10 @@ export const drawGlyph = (props: {
         .padAngle(0)
         .cornerRadius(0)
     );
+
+  if (onlyRul) {
+    return;
+  }
 
   // 画模型圆弧
   const posScale = d3

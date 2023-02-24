@@ -6,7 +6,7 @@ import { FeatureType } from "./type";
 import { RectType } from "../type";
 import { COLORS, FONT_SIZE, PRIMARY_COLOR } from "../../style";
 import { drawGlyph } from "../components/drawFunction";
-import { culFeatureImportance, scaleFunction } from "../components/utils";
+import { scaleFunction } from "../components/utils";
 import { MARGIN } from "../constant";
 import { observer } from "mobx-react";
 
@@ -78,21 +78,61 @@ export default observer(function FeatureView(props: any): JSX.Element {
           +xScale(i + 1) + width / 2 - width * 0.05
         ]);
 
-      const valueScale = d3
-        .scaleLinear()
-        .domain([maxMin.importance.min, maxMin.importance.max])
-        .range([rect.bottom - 12, rect.top]);
-
       const middleHeight = (rect.bottom - 12 + rect.top) / 2;
+
+      const maxAbsImportance = Math.max(
+        Math.abs(maxMin.importance.max),
+        Math.abs(maxMin.importance.min)
+      );
+      console.log(maxAbsImportance);
+
+      const posValueScale = d3
+        .scaleLinear()
+        .domain([0, maxAbsImportance])
+        .range([middleHeight, rect.top]);
+      const negValueScale = d3
+        .scaleLinear()
+        .domain([0, -maxAbsImportance])
+        .range([middleHeight, rect.bottom - 12]);
 
       g.append("rect")
         .attr("x", xRectBand.range()[0])
-        .attr("y", valueScale.range()[1])
+        .attr("y", rect.top)
         .attr("width", xRectBand.range()[1] - xRectBand.range()[0])
         .attr("height", rect.bottom - 12 - rect.top)
-        .attr("fill", "none")
+        .attr("fill", "#fff")
         .attr("stroke", "#ccc")
-        .attr("stroke-dasharray", 1);
+        .attr("stroke-dasharray", 1)
+        .on("mouseover", (e: any) => {
+          d3.select("#tooltip")
+            .html(
+              // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+              `${String(d.name)} # ` +
+                d.overImportance
+                  .map(
+                    (item: any) =>
+                      `<br /> ${String(item.label)} : ${String(
+                        item.importance
+                      )}`
+                  )
+                  .join(" ")
+            )
+            .style("visibility", "visible")
+            .style("top", `${d3.pointer(e, document)[1] - 10}px`)
+            .style("left", `${d3.pointer(e, document)[0] + 10}px`);
+        })
+        .on("mousemove", (e: any): void => {
+          d3.select("#tooltip")
+
+            .style("top", `${d3.pointer(e, document)[1] - 10}px`)
+            .style("left", `${d3.pointer(e, document)[0] + 10}px`);
+        })
+        .on("mouseleave", (): void => {
+          d3.select("#tooltip")
+            .style("visibility", "hidden")
+            .style("top", "-1000px")
+            .style("left", "-1000px");
+        });
 
       g.selectAll()
         .data(d.overImportance)
@@ -104,7 +144,7 @@ export default observer(function FeatureView(props: any): JSX.Element {
             Number(xRectBand(d.label)) + xRectBand.step() * 0.05
         )
         .attr("y", (d: any, i: number) =>
-          d.importance > 0 ? valueScale(d.importance) : middleHeight
+          d.importance > 0 ? posValueScale(d.importance) : middleHeight
         )
         .attr("width", xRectBand.step() * 0.9)
         .attr("height", (d: any, i: number) => {
@@ -114,7 +154,9 @@ export default observer(function FeatureView(props: any): JSX.Element {
           //   maxMin.max,
           //   valueScale(d.importance)
           // );
-          return Math.abs(valueScale(d.importance) - middleHeight);
+          return d.importance > 0
+            ? middleHeight - posValueScale(d.importance)
+            : negValueScale(d.importance) - middleHeight;
         })
         .attr("fill", (d: any, i: number) => COLORS[i]);
 
@@ -179,6 +221,7 @@ export default observer(function FeatureView(props: any): JSX.Element {
     g: any,
     data: any[],
     features: any[],
+    maxMin: any,
     rect: RectType,
     xScale: any,
     yScale: d3.ScaleLinear<number, number, never>,
@@ -261,15 +304,9 @@ export default observer(function FeatureView(props: any): JSX.Element {
 
     const calRadio = (d: any, i: number): number => {
       const width = xScale(i + 1, "band") / 2;
-      const meanValue = xScale(i + 1, "param");
+      const maxValue = maxMin.maxAbsImportance[i];
 
-      return (
-        width *
-        (d.importance.reduce((s: number, d: any) => s + Math.abs(+d.value), 0) /
-          d.importance.length /
-          meanValue) *
-        0.5
-      );
+      return width * (d.meanAbsImportance / maxValue) * 0.8;
     };
 
     data.forEach((item, index) => {
@@ -308,11 +345,10 @@ export default observer(function FeatureView(props: any): JSX.Element {
     //   .domain([-1, MAX_FEATURE_DATA.length + 1])
     //   .range([mainRect.left, mainRect.right]);
 
-    const featureImportance = culFeatureImportance(featureInfo);
     const scaleFunc = scaleFunction(
       [1, featureInfo.length + 2],
       [mainRect.left + minBandWidth + 10, mainRect.right],
-      featureImportance,
+      maxMin.meanAbsImportance,
       minBandWidth
     );
 
@@ -366,7 +402,7 @@ export default observer(function FeatureView(props: any): JSX.Element {
           .attr("class", "join-glyph")
           .attr("cx", (d: any) => d.x)
           .attr("cy", (d: any) => d.y)
-          .attr("r", (d: any) => Math.max(0, d.r - 1.5))
+          .attr("r", (d: any) => d.r)
           .attr("transform", (d: any) => `translate(${x - r}, ${y - r})`)
           // .attr("r", (d: any) => {
           //   return d.r * r;
@@ -384,14 +420,14 @@ export default observer(function FeatureView(props: any): JSX.Element {
           // .attr("stroke-width", (d: any, i) => {
           //   return d.children === undefined ? 3 : 0.5;
           // })
-          .attr("opacity", 1)
-          .on("mouseover", (e: any, d: any) => {
-            d3.select("#tooltip")
-              .html(d.data.name)
-              .style("visibility", "visible")
-              .style("top", `${d3.pointer(e, document)[1] - 10}px`)
-              .style("left", `${d3.pointer(e, document)[0] + 10}px`);
-          });
+          .attr("opacity", 1);
+        // .on("mouseover", (e: any, d: any) => {
+        //   d3.select("#tooltip")
+        //     .html(d.data.name)
+        //     .style("visibility", "visible")
+        //     .style("top", `${d3.pointer(e, document)[1] - 10}px`)
+        //     .style("left", `${d3.pointer(e, document)[0] + 10}px`);
+        // });
 
         svg
           .selectAll()
@@ -399,12 +435,12 @@ export default observer(function FeatureView(props: any): JSX.Element {
           .join("rect")
           .attr("class", "join-glyph")
           .attr("x", (d: any) => d.x - d.r * 0.5)
-          .attr("y", (d: any) => d.y - 0.5)
+          .attr("y", (d: any) => d.y - d.r * 0.1)
           .attr("transform", (d: any) => `translate(${x - r}, ${y - r})`)
           .attr("width", (d: any) => {
             return d.children === undefined ? d.r : 0;
           })
-          .attr("height", 1)
+          .attr("height", (d: any) => d.r * 0.2)
           .attr("fill", "#fff");
 
         svg
@@ -412,10 +448,10 @@ export default observer(function FeatureView(props: any): JSX.Element {
           .data(nodes)
           .join("rect")
           .attr("class", "join-glyph")
-          .attr("x", (d: any) => d.x - 0.5)
+          .attr("x", (d: any) => d.x - d.r * 0.1)
           .attr("y", (d: any) => d.y - d.r * 0.5)
           .attr("transform", (d: any) => `translate(${x - r}, ${y - r})`)
-          .attr("width", 1)
+          .attr("width", (d: any) => d.r * 0.2)
           .attr("height", (d: any) => {
             return d.children === undefined && d.data.raw > 0 ? d.r : 0;
           })
@@ -472,6 +508,7 @@ export default observer(function FeatureView(props: any): JSX.Element {
       svg.append("g"),
       data,
       featureInfo,
+      maxMin,
       mainRect,
       xScale,
       yScale,

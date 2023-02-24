@@ -30,6 +30,8 @@ export const scaleFunction = (domain, range, widthParam, minWidth) => {
     _domain[domain[0] + i] = i;
   }
 
+  console.log(bandWidth, posX);
+
   return (d, op) => {
     switch (op) {
       case undefined:

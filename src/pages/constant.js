@@ -1,4 +1,4 @@
-import * as d3 from "d3-scale";
+import * as d3 from "d3";
 
 export const MARGIN = {
   left: 10,
@@ -9,7 +9,4 @@ export const MARGIN = {
   yGap: 10
 };
 
-export const UnitColor = d3
-  .scaleLinear()
-  .domain([0, 100])
-  .range(["#dcdcdc", "#239df2"]);
+export const UnitColor = (unitId) => d3.interpolateRdBu(unitId / 100);

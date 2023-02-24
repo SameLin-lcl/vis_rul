@@ -373,7 +373,7 @@ export default observer(function Performance(props: any): JSX.Element {
         sg.append("circle")
           .attr("cx", xScale(i) + width / 2)
           .attr("cy", yPos + barHeight + padding + width / 2 + 1)
-          .attr("r", varianceScale(variance))
+          .attr("r", Math.max(0, varianceScale(variance)))
           .style("fill", COLORS[i]);
       });
     });

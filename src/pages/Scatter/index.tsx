@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import ViewContainer from "../components/ViewContainer";
 import * as d3 from "d3";
 import { drawGlyph } from "../components/drawFunction";
-import { MARGIN } from "../constant";
+import { MARGIN, UnitColor } from "../constant";
 import { observer } from "mobx-react";
 import { Select, Switch } from "antd";
 
@@ -68,6 +68,7 @@ export default observer(function ScatterView(props: any): JSX.Element {
         const [[x0, y0], [x1, y1]] = selection;
 
         const filterFunction = (d: any): boolean => {
+          if (d === undefined) return false;
           const res =
             x0 <= xScale(d.x) &&
             xScale(d.x) < x1 &&
@@ -118,6 +119,7 @@ export default observer(function ScatterView(props: any): JSX.Element {
 
     const genUnitPath = d3
       .line()
+      .curve(d3.curveCatmullRom.alpha(0.5))
       .x((d: any, i: number) => xScale(d.x))
       .y((d: any, i: number) => yScale(d.y));
 
@@ -134,10 +136,10 @@ export default observer(function ScatterView(props: any): JSX.Element {
 
     gradient.append("stop").attr("offset", "100%").attr("stop-color", "#f00");
 
-    const mouseOver = (e: any, d: any): void => {
+    const mouseOver = (e: any, d: any, color?: any): void => {
       const unitData = data.filter((item) => item.unitId === d.unitId);
       svg
-        .selectAll(".unit-path")
+        .selectAll()
         .data([unitData])
         .enter()
         .append("path")
@@ -145,9 +147,9 @@ export default observer(function ScatterView(props: any): JSX.Element {
         .attr("gradientUnits", "userSpaceOnUse")
         .attr("d", genUnitPath)
         .style("fill", "none")
-        .attr("stroke", "url(#line-gradient)")
+        .attr("stroke", color ?? "url(#line-gradient)")
         // .style("stroke", "#f00")
-        .style("stroke-width", 1);
+        .style("stroke-width", color !== undefined ? 0.3 : 1);
     };
 
     const mouseLeave = (e: any, d: any): void => {
@@ -169,6 +171,12 @@ export default observer(function ScatterView(props: any): JSX.Element {
           .classed("selected-instance")
       );
     };
+
+    if (onlyUnit) {
+      data.forEach((d) => {
+        mouseOver(undefined, d, UnitColor(d.unitId));
+      });
+    }
 
     data.forEach((d) => {
       drawGlyph({
