@@ -184,6 +184,7 @@ export default observer(function FeatureView(props: any): JSX.Element {
     data.forEach((d, i) => {
       const gBlock = g
         .append("g")
+        .datum(d)
         .on("mouseenter", () => handleMouseOver(undefined, d))
         .on("mouseleave", () => handleMouseLeave(undefined, d));
 
@@ -210,9 +211,11 @@ export default observer(function FeatureView(props: any): JSX.Element {
         xScale: () => rect.right - glyphRadius - 10,
         yScale: () => yScale(i),
         radius: glyphRadius,
-        backRef: true,
-        event: { dbclick: handleSelectInstance }
+        backRef: true
+        // event: { dbclick: handleSelectInstance }
       });
+
+      gBlock.on("dblclick", handleSelectInstance);
     });
   };
 
@@ -306,8 +309,8 @@ export default observer(function FeatureView(props: any): JSX.Element {
         .attr("cx", (d: any, i: number) => xScale(i + 1))
         .attr("cy", (d: any, i: number) => valueScales[i + 1](d.value))
         .attr("r", calRadio)
-        .style("fill", "#c4def0")
-        .style("opacity", 0.4)
+        .style("fill", "#66b3e9")
+        .style("opacity", 0.1)
         .attr(
           "class",
           (d: any, i: number) =>

@@ -23,7 +23,6 @@ code {
 
 .selected-unit {
   opacity: 1 !important;
-  fill: #1677ff;
   stroke: #1677ff;
   stroke-width: 2px;
 }
@@ -31,9 +30,8 @@ code {
 
 .selecting-unit {
   opacity: 1 !important;
-  fill: #1677ff;
   stroke: #1677ff;
-  stroke-width: 2px;
+  stroke-width: 4px;
 }
 
 .selected-instance {

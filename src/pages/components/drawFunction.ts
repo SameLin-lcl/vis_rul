@@ -1,6 +1,5 @@
 import { DataType } from "../Scatter/type";
 import * as d3 from "d3";
-import { UnitColor } from "../constant";
 import { COLORS } from "../../style";
 
 type ScaleType = (x?: number) => number;
@@ -87,8 +86,8 @@ export const drawGlyph = (props: {
     g.append("circle")
       .attr("cx", xScale(d.x))
       .attr("cy", yScale(d.y))
-      .attr("r", ARC_IN_RADIUS)
-      .attr("fill", UnitColor(d.unitId as number))
+      .attr("r", 1)
+      .attr("fill", d.rul === 0 ? "#f00" : "#b2b2b2")
       .attr(
         "class",
         `${classPrefix} ${classPrefix}-${String(d.instanceId ?? 0)}`
@@ -141,7 +140,7 @@ export const drawGlyph = (props: {
   g.append("path")
     .attr("transform", `translate(${xScale(d.x)}, ${yScale(d.y)})`)
     .attr("fill", "transparent")
-    .attr("stroke-width", "0.5")
+    .attr("stroke-width", 0.3)
     .attr("stroke", "gray")
     .attr(
       "d",
@@ -191,7 +190,8 @@ export const drawGlyph = (props: {
 
   const valueScale = d3
     .scaleLinear()
-    .domain([modelPerf, 0])
+    // .domain([modelPerf, 0])
+    .domain([0, modelPerf])
     .range([ARC_IN_RADIUS, ARC_OUT_RADIUS]);
 
   if (backRef) {

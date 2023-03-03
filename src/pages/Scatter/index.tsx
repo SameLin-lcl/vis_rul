@@ -198,6 +198,7 @@ export default observer(function ScatterView(props: any): JSX.Element {
         radius: 12,
         onlyRul,
         onlyUnit,
+        backRef: false,
         classPrefix: "instance-pca",
         event: { mouseOver, mouseLeave, click: mouseClick }
       });
