@@ -54,3 +54,9 @@ code {
 .selected-model{
   stroke: #1677ff;
 }
+
+
+.prototype{
+  fill: none !important;
+  stroke: black !important;
+}

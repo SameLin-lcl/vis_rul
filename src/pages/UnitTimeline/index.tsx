@@ -188,7 +188,7 @@ export default observer(function UnitTimeline(props: any): JSX.Element {
     const valueScale = d3
       .scaleLinear()
       .domain([maxMin.pred.min, maxMin.pred.max])
-      .range([rect.top, rect.top + modelLineHeight]);
+      .range([rect.top + modelLineHeight, rect.top]);
 
     const varianceScale = d3
       .scaleLinear()
@@ -211,12 +211,34 @@ export default observer(function UnitTimeline(props: any): JSX.Element {
       .data(data)
       .enter()
       .append("rect")
+      .attr("class", (d: any) => `back-rect-${String(d.rul)}`)
       .attr("x", (d, i) => xScale(i))
       .attr("y", rect.top)
       .attr("width", width)
       .attr("height", modelLineHeight)
       .style("fill", (d: any) => backColorScale(d.variance))
-      .style("opacity", 0.3);
+      .style("opacity", 0.3)
+      .on("mouseover", function (e, d) {
+        // console.log(d);
+        d3.select("#tooltip")
+          .html(
+            `RUL: ${String(d.rul)}
+                <br/> Pred: ${String(d.pred)}
+                <br/> meanPred: ${String(d.meanPred)}
+                <br/> variance: ${String(d.variance)}`
+          )
+          .style("visibility", "visible")
+          .style("top", `${d3.pointer(e, document)[1] - 10}px`)
+          .style("left", `${d3.pointer(e, document)[0] + 20}px`);
+        d3.selectAll(`.back-rect-${String(d.rul)}`).style("stroke", "#f00");
+      })
+      .on("mouseleave", function (e, d) {
+        d3.select("#tooltip")
+          .style("visibility", "hidden")
+          .style("top", "-1000px")
+          .style("left", "-1000px");
+        d3.selectAll(`.back-rect-${String(d.rul)}`).style("stroke", "none");
+      });
 
     g.selectAll()
       .data(data)

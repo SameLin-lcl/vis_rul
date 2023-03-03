@@ -71,6 +71,7 @@ export const drawGlyph = (props: {
       .style("visibility", "hidden")
       .style("top", "-1000px")
       .style("left", "-1000px");
+
     useEvent && event?.mouseLeave?.(e, d);
   };
 
@@ -173,7 +174,10 @@ export const drawGlyph = (props: {
         .endAngle(arcScale(d.rul))
         .padAngle(0)
         .cornerRadius(0)
-    );
+    )
+    .on("mouseover", handleMouseOver)
+    .on("mousemove", handleMouseMove)
+    .on("mouseout", handleMouseLeave);
 
   if (onlyRul) {
     return;
@@ -206,7 +210,10 @@ export const drawGlyph = (props: {
           .endAngle(Math.PI)
           .padAngle(0)
           .cornerRadius(0)
-      );
+      )
+      .on("mouseover", handleMouseOver)
+      .on("mousemove", handleMouseMove)
+      .on("mouseout", handleMouseLeave);
   }
 
   d.modelPerf.forEach(({ label, value }, index: number) => {
@@ -223,14 +230,17 @@ export const drawGlyph = (props: {
           .endAngle(posScale(1 + index) - ARC_MARGIN)
           .padAngle(0)
           .cornerRadius(0)
-      );
+      )
+      .on("mouseover", handleMouseOver)
+      .on("mousemove", handleMouseMove)
+      .on("mouseout", handleMouseLeave);
   });
 
   g.datum(d)
     .attr("class", `${classPrefix} ${classPrefix}-${String(d.instanceId ?? 0)}`)
-    .on("mouseover", handleMouseOver)
-    .on("mousemove", handleMouseMove)
-    .on("mouseleave", handleMouseLeave)
+    // .on("mouseover", handleMouseOver)
+    // .on("mousemove", handleMouseMove)
+    // .on("mouseout", handleMouseLeave)
     .on("click", handleClick)
     .on("dblclick", handleDbClick);
 };

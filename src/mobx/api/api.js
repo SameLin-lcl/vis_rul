@@ -45,7 +45,8 @@ export const fetchInstances = (params) => {
     params: {
       units: JSON.stringify(params?.units),
       models: JSON.stringify(params?.models),
-      win: params?.win
+      win: params?.win,
+      rulRange: JSON.stringify(params?.rulRange)
     }
   }).then((res) => res.data.data);
 };

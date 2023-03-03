@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import { FEATURE_DATA } from "./mock";
 import { FeatureType } from "./type";
 import { RectType } from "../type";
-import { COLORS, FONT_SIZE, PRIMARY_COLOR } from "../../style";
+import { COLORS, FONT_SIZE } from "../../style";
 import { drawGlyph } from "../components/drawFunction";
 import { scaleFunction } from "../components/utils";
 import { MARGIN } from "../constant";
@@ -84,7 +84,6 @@ export default observer(function FeatureView(props: any): JSX.Element {
         Math.abs(maxMin.importance.max),
         Math.abs(maxMin.importance.min)
       );
-      console.log(maxAbsImportance);
 
       const posValueScale = d3
         .scaleLinear()
@@ -248,31 +247,21 @@ export default observer(function FeatureView(props: any): JSX.Element {
         .attr("transform", `translate(${String(xScale(i))}, ${0})`);
 
       if (i === 0) {
-        gAxis
-          .call(
-            d3
-              .axisLeft(valueScale)
-              .tickSize(0)
-              .ticks(5)
-              .tickFormat(() => "")
-          )
-          .selectAll("text")
-          .style("font-size", 8);
+        gAxis.call(
+          d3
+            .axisLeft(valueScale)
+            .tickSize(0)
+            .ticks(5)
+            .tickFormat(() => "")
+        );
       } else {
-        gAxis
-          .call(
-            d3.axisLeft(valueScale).tickSize(0).tickValues([])
-            // .tickValues([d.min, d.max])
-          )
-          .selectAll("text")
-          .style("font-size", 8)
-          .style("text-anchor", "middle")
-          .attr("dx", 3)
-          .attr("dy", (d: any, i: number) => (i === 0 ? -2 : 8))
-          .attr("color", PRIMARY_COLOR);
+        gAxis.call(
+          d3.axisLeft(valueScale).tickSize(0).tickValues([])
+          // .tickValues([d.min, d.max])
+        );
       }
 
-      gAxis.style("color", "#999").style("stroke-width", 0.6);
+      gAxis.style("color", "#d5d5d5").style("stroke-width", 0.6);
     });
 
     /**

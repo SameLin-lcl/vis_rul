@@ -46,7 +46,7 @@ export const ScatterChart = ({ units, unitsMaxMin }: any): JSX.Element => {
     const yScale = d3
       .scaleLinear()
       .domain([unitsMaxMin.y.min, unitsMaxMin.y.max])
-      .range([mainRect.top, mainRect.bottom]);
+      .range([mainRect.bottom - 10, mainRect.top]);
 
     const colorScaler = d3
       .scaleLinear()

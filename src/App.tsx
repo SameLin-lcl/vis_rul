@@ -6,6 +6,15 @@ import UnitTimeline from "./pages/UnitTimeline";
 import FeatureView from "./pages/FeatureAnalysis";
 import { globalData } from "./mobx/store/globalData";
 
+/*
+
+document.querySelectorAll("path,circle,line,rect").forEach(item => {
+    item.style.fill="none";
+    item.style.stroke="#666";
+})
+
+ */
+
 function App(): JSX.Element {
   return (
     <div

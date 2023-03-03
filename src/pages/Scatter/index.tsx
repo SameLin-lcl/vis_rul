@@ -5,7 +5,8 @@ import * as d3 from "d3";
 import { drawGlyph } from "../components/drawFunction";
 import { MARGIN, UnitColor } from "../constant";
 import { observer } from "mobx-react";
-import { Select, Switch } from "antd";
+import { Select, Slider, Switch } from "antd";
+import { debounce } from "../components/utils";
 
 export default observer(function ScatterView(props: any): JSX.Element {
   const { containerStyle, globalData } = props;
@@ -15,6 +16,11 @@ export default observer(function ScatterView(props: any): JSX.Element {
   const [svg, setSVG] = useState(d3.create("svg"));
   const [onlyRul, setOnlyRul] = useState(false);
   const [onlyUnit, setOnlyUnit] = useState(false);
+
+  const handleChangeRULRange = debounce(
+    globalData.updateRulRange.bind(globalData),
+    500
+  );
 
   useEffect(() => {
     if (svg !== null && dimensions.width !== 0) {
@@ -146,6 +152,7 @@ export default observer(function ScatterView(props: any): JSX.Element {
         .attr("class", "unit-path")
         .attr("gradientUnits", "userSpaceOnUse")
         .attr("d", genUnitPath)
+        .style("z-index", "-1")
         .style("fill", "none")
         .attr("stroke", color ?? "url(#line-gradient)")
         // .style("stroke", "#f00")
@@ -243,6 +250,21 @@ export default observer(function ScatterView(props: any): JSX.Element {
             value={globalData.win}
             onChange={(v) => globalData.updateWin(v)}
             options={[1, 2, 5, 10, 20].map((item) => ({ value: item }))}
+          />
+        </div>
+        <div style={{ marginTop: 10 }}>
+          rul:{" "}
+          <Slider
+            range
+            max={globalData.unitsMaxMin?.rul?.max}
+            min={0}
+            value={globalData.rulRange}
+            marks={{
+              0: "0",
+              [globalData.unitsMaxMin?.rul?.max]:
+                globalData.unitsMaxMin?.rul?.max
+            }}
+            onChange={handleChangeRULRange}
           />
         </div>
       </div>

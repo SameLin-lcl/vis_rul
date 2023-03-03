@@ -18,6 +18,7 @@ class GlobalData {
   modelsMaxMin = {};
 
   win = 1;
+  rulRange = [0, 311];
   instances = [];
   instancesMaxMin = {};
 
@@ -66,6 +67,12 @@ class GlobalData {
     this.updateInstance();
   }
 
+  updateRulRange(range) {
+    console.log(this);
+    this.rulRange = range;
+    this.updateInstance();
+  }
+
   updateSelectedModel(model, isSelected) {
     if (isSelected) {
       this.selectedModels = this._models.filter(
@@ -77,6 +84,7 @@ class GlobalData {
       );
     }
     this.updateInstance();
+    this.updateInstanceFeatures();
     this.updateTimeline();
   }
 
@@ -84,7 +92,8 @@ class GlobalData {
     fetchInstances({
       models: this.selectedModels,
       units: this.selectedUnits,
-      win: this.win
+      win: this.win,
+      rulRange: this.rulRange
     }).then(
       (data) => {
         this.instances = data.instances;
