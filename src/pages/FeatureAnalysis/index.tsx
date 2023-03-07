@@ -284,9 +284,8 @@ export default observer(function FeatureView(props: any): JSX.Element {
         ]);
       })
       .style("fill", "none")
-      .style("stroke", "#5094d1")
+      .style("stroke", "#a5caeb")
       .style("stroke-width", 1)
-      .style("opacity", 0.5)
       .attr("class", (d: any) => `feat-id-${String(d.instanceId)} feat-line`)
       .on("mouseover", handleMouseOver)
       .on("mouseleave", handleMouseLeave);

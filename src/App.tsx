@@ -29,48 +29,48 @@ function App(): JSX.Element {
     >
       <div
         style={{
-          flex: 1,
-          display: "flex",
-          gap: 5,
-          flexDirection: "column"
-        }}
-      >
-        <SettingPanel
-          containerStyle={{ height: "35vh" }}
-          globalData={globalData}
-        />
-        <Performance
-          containerStyle={{ height: "65vh" }}
-          globalData={globalData}
-        />
-      </div>
-      <div
-        style={{
           flex: 2,
           display: "flex",
           gap: 5,
           flexDirection: "column"
         }}
       >
-        <ScatterView
-          containerStyle={{ height: "50vh" }}
+        <SettingPanel
+          containerStyle={{ width: "15vw", height: "35vh" }}
           globalData={globalData}
         />
-        <FeatureView
-          containerStyle={{ height: "50vh" }}
+        <Performance
+          containerStyle={{ width: "15vw", height: "65vh" }}
           globalData={globalData}
-        />{" "}
+        />
       </div>
       <div
         style={{
-          flex: 6,
+          flex: 4,
+          display: "flex",
+          gap: 5,
+          flexDirection: "column"
+        }}
+      >
+        <ScatterView
+          containerStyle={{ width: "40vw", height: "50vh" }}
+          globalData={globalData}
+        />
+        <FeatureView
+          containerStyle={{ width: "40vw", height: "50vh" }}
+          globalData={globalData}
+        />
+      </div>
+      <div
+        style={{
+          flex: 4,
           display: "flex",
           gap: 5,
           flexDirection: "column"
         }}
       >
         <UnitTimeline
-          containerStyle={{ height: "100vh" }}
+          containerStyle={{ width: "45vw", height: "100vh" }}
           globalData={globalData}
         />
       </div>
