@@ -93,6 +93,7 @@ export const ScatterChart = ({ units, unitsMaxMin }: any): JSX.Element => {
         if (isSelected) {
           d3.selectAll(".unit-pca")
             .classed("selecting-unit", false)
+            .classed("selected-unit", false)
             .filter(filterFunction)
             .classed("selected-unit", true);
         } else {
