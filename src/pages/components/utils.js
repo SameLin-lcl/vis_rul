@@ -30,8 +30,6 @@ export const scaleFunction = (domain, range, widthParam, minWidth) => {
     _domain[domain[0] + i] = i;
   }
 
-  console.log(bandWidth, posX);
-
   return (d, op) => {
     switch (op) {
       case undefined:
@@ -48,9 +46,7 @@ export const scaleFunction = (domain, range, widthParam, minWidth) => {
 
 export function debounce(func, time) {
   let timer = null;
-  console.log(this);
   return function (...args) {
-    console.log(this);
     if (timer) clearTimeout(timer);
     timer = setTimeout(() => {
       timer = null;

@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import ViewContainer from "../components/ViewContainer";
 import * as d3 from "d3";
 import { drawGlyph } from "../components/drawFunction";
-import { MARGIN, UnitColor } from "../constant";
+import { MARGIN } from "../constant";
 import { observer } from "mobx-react";
 import { Select, Slider, Switch } from "antd";
 import { debounce } from "../components/utils";
@@ -142,7 +142,7 @@ export default observer(function ScatterView(props: any): JSX.Element {
 
     gradient.append("stop").attr("offset", "100%").attr("stop-color", "#f00");
 
-    const mouseOver = (e: any, d: any, color?: any): void => {
+    const mouseOver = (e: any, d: any, isUnit = false): void => {
       const unitData = data.filter((item) => item.unitId === d.unitId);
       svg
         .selectAll()
@@ -154,9 +154,9 @@ export default observer(function ScatterView(props: any): JSX.Element {
         .attr("d", genUnitPath)
         .style("z-index", "-1")
         .style("fill", "none")
-        .attr("stroke", color ?? "url(#line-gradient)")
+        .attr("stroke", "url(#line-gradient)")
         // .style("stroke", "#f00")
-        .style("stroke-width", color !== undefined ? 0.3 : 1);
+        .style("stroke-width", isUnit ? 0.3 : 1);
     };
 
     const mouseLeave = (e: any, d: any): void => {
@@ -171,17 +171,11 @@ export default observer(function ScatterView(props: any): JSX.Element {
         "selected-instance",
         !isSelected
       );
-      console.log(`instance-pca-${String(d.instanceId)}`, !isSelected);
-      console.log(
-        d3
-          .select(`.instance-pca-${String(d.instanceId)}`)
-          .classed("selected-instance")
-      );
     };
 
     if (onlyUnit) {
       data.forEach((d) => {
-        mouseOver(undefined, d, UnitColor(d.unitId));
+        mouseOver(undefined, d, true);
       });
     }
 
@@ -195,7 +189,7 @@ export default observer(function ScatterView(props: any): JSX.Element {
           globalData.instancesMaxMin.modelPerf?.max,
           Math.abs(globalData.instancesMaxMin.modelPerf?.max)
         ),
-        radius: 12,
+        radius: 15,
         onlyRul,
         onlyUnit,
         backRef: false,

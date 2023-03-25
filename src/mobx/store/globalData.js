@@ -68,7 +68,6 @@ class GlobalData {
   }
 
   updateRulRange(range) {
-    console.log(this);
     this.rulRange = range;
     this.updateInstance();
   }

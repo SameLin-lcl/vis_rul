@@ -1,4 +1,11 @@
 import axios from "axios";
+import {
+  mockFetchFeatures,
+  mockFetchInstances,
+  mockFetchInstanceTimeline,
+  mockFetchModels,
+  mockFetchUnitsPca
+} from "./mock";
 // @ts-nocheck
 
 const request = axios.create({
@@ -7,14 +14,14 @@ const request = axios.create({
   headers: { "X-Custom-Header": "foobar" }
 });
 
-const IS_MOCK = true;
+const IS_MOCK = false;
 
 /**
  * @returns {Promise<{maxMin: {features: {min: number, max: number}, variance: {min: number, max: number}, perf: [{max: number, label: string},{max: number, label: string},{max: number, label: string}]}, models: {features: *, model: *, perf: [{label: string, value: number},{label: string, value: number},{label: string, value: number}]}[]}>}
  */
 
 export const fetchModels = () => {
-  // if (IS_MOCK) return Promise.resolve(mockFetchModels());
+  if (IS_MOCK) return Promise.resolve(mockFetchModels());
   return request({
     method: "get",
     url: "/queryModelScore"
@@ -27,7 +34,7 @@ export const fetchModels = () => {
  */
 
 export const fetchUnitsPca = (params = { rul: [1, 340] }) => {
-  // if (IS_MOCK) return Promise.resolve(mockFetchUnitsPca());
+  if (IS_MOCK) return Promise.resolve(mockFetchUnitsPca());
   return request({
     method: "get",
     url: "/queryUnitsPca",
@@ -38,7 +45,7 @@ export const fetchUnitsPca = (params = { rul: [1, 340] }) => {
 };
 
 export const fetchInstances = (params) => {
-  // if (IS_MOCK) return Promise.resolve(mockFetchInstances(params));
+  if (IS_MOCK) return Promise.resolve(mockFetchInstances(params));
   return request({
     method: "get",
     url: "/queryInputData",
@@ -52,7 +59,7 @@ export const fetchInstances = (params) => {
 };
 
 export const fetchFeatures = (params) => {
-  // if (IS_MOCK) return Promise.resolve(mockFetchFeatures(params));
+  if (IS_MOCK) return Promise.resolve(mockFetchFeatures(params));
   return request({
     method: "get",
     url: "/queryInstanceFeatures",
@@ -64,7 +71,7 @@ export const fetchFeatures = (params) => {
 };
 
 export const fetchInstanceTimeline = (params) => {
-  // if (IS_MOCK) return Promise.resolve(mockFetchInstanceTimeline(params));
+  if (IS_MOCK) return Promise.resolve(mockFetchInstanceTimeline(params));
   return request({
     method: "get",
     url: "/queryInstanceTimeline",

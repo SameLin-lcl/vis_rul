@@ -219,7 +219,6 @@ export default observer(function UnitTimeline(props: any): JSX.Element {
       .style("fill", (d: any) => backColorScale(d.variance))
       .style("opacity", 0.3)
       .on("mouseover", function (e, d) {
-        // console.log(d);
         d3.select("#tooltip")
           .html(
             `RUL: ${String(d.rul)}
@@ -295,7 +294,6 @@ export default observer(function UnitTimeline(props: any): JSX.Element {
         .range(["#ffffff", "#f27272"])
     );
 
-    console.log(maxMin.importance.min, maxMin.importance.max);
 
     data.forEach((item, index) => {
       g.selectAll()

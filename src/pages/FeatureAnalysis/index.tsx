@@ -24,7 +24,7 @@ export default observer(function FeatureView(props: any): JSX.Element {
 
   useEffect(() => {
     globalData.updateInstanceFeatures();
-  }, []);
+  }, [globalData]);
 
   useLayoutEffect(() => {
     console.log("LOADING FEATURE");
@@ -43,7 +43,7 @@ export default observer(function FeatureView(props: any): JSX.Element {
         svg.selectAll("*").remove();
       };
     }
-  }, [svg, data, dimensions, globalData.instanceImportance]);
+  }, [svg, data, dimensions, globalData.instanceImportance, globalData.featureImportance, globalData.importanceMaxMin]);
 
   const handleSelectInstance = (e: any, d: any): void => {
     globalData.updateSelectedInput(d.instanceId);
@@ -147,12 +147,6 @@ export default observer(function FeatureView(props: any): JSX.Element {
         )
         .attr("width", xRectBand.step() * 0.9)
         .attr("height", (d: any, i: number) => {
-          // console.log(
-          //   d.importance,
-          //   maxMin.min,
-          //   maxMin.max,
-          //   valueScale(d.importance)
-          // );
           return d.importance > 0
             ? middleHeight - posValueScale(d.importance)
             : negValueScale(d.importance) - middleHeight;
