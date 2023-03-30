@@ -4,7 +4,7 @@ import SettingPanel from "./pages/SettingPanel";
 import ScatterView from "./pages/Scatter";
 import UnitTimeline from "./pages/UnitTimeline";
 import FeatureView from "./pages/FeatureAnalysis";
-import { globalData } from "./mobx/store/globalData";
+import {globalData} from "./mobx/store/globalData";
 
 /*
 
@@ -29,48 +29,48 @@ function App(): JSX.Element {
     >
       <div
         style={{
-          flex: 2,
+          flex: 1,
           display: "flex",
           gap: 5,
           flexDirection: "column"
         }}
       >
         <SettingPanel
-          containerStyle={{ width: "15vw", height: "35vh" }}
+          containerStyle={{height: "35vh"}}
           globalData={globalData}
         />
         <Performance
-          containerStyle={{ width: "15vw", height: "65vh" }}
+          containerStyle={{height: "65vh"}}
           globalData={globalData}
         />
       </div>
       <div
         style={{
-          flex: 4,
+          flex: 3,
           display: "flex",
           gap: 5,
           flexDirection: "column"
         }}
       >
         <ScatterView
-          containerStyle={{ width: "40vw", height: "50vh" }}
+          containerStyle={{height: "50vh"}}
           globalData={globalData}
         />
         <FeatureView
-          containerStyle={{ width: "40vw", height: "50vh" }}
+          containerStyle={{height: "50vh"}}
           globalData={globalData}
         />
       </div>
       <div
         style={{
-          flex: 4,
+          flex: 3,
           display: "flex",
           gap: 5,
           flexDirection: "column"
         }}
       >
         <UnitTimeline
-          containerStyle={{ width: "45vw", height: "100vh" }}
+          containerStyle={{height: "100vh"}}
           globalData={globalData}
         />
       </div>
